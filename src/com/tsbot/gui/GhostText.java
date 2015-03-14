@@ -33,6 +33,7 @@ public class GhostText implements FocusListener, KeyListener {
     private JTextComponent field;
     private Color oldForeground;
 
+    
     /**
      * Default constructor.
      *
@@ -52,6 +53,7 @@ public class GhostText implements FocusListener, KeyListener {
         focusLost(null);
     }
 
+
     /**
      * If the user clicked on the field, this will execute the block of code inside of it.
      * In this case, removal of ghost text as user will start typing and changing the oldForeground back to the one before.
@@ -65,6 +67,7 @@ public class GhostText implements FocusListener, KeyListener {
             field.setCaretPosition(0);
         }
     }
+
 
     /**
      * If the user lost focus on the field, a condition has to be tested. If the user did not write anything in
@@ -81,10 +84,12 @@ public class GhostText implements FocusListener, KeyListener {
         }
     }
 
+
     @Override
     public void keyTyped(KeyEvent e) {
 
     }
+
 
     /**
      * Detects any action done by the user that triggers a condition. If the user started to type
@@ -109,6 +114,7 @@ public class GhostText implements FocusListener, KeyListener {
             }
         }
     }
+
 
     /**
      * if the text is empty, the ghost text and the foreground are restored. Please note:

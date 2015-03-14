@@ -14,6 +14,12 @@ import java.awt.Font;
 public class TSBotLogin extends JFrame {
 
 
+    /**
+     * Constructor for {@link com.tsbot.gui.TSBotLogin}.
+     * Builds the JFrame in question with the provided title.
+     *
+     * @param title the specified title of the frame.
+     */
     public TSBotLogin(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,7 +29,12 @@ public class TSBotLogin extends JFrame {
         setLayout(null);
     }
 
-    public void init() {
+
+    /**
+     * Initiates all the needed components onto the frame.
+     * For optimal usage, call of the method is to be done before setting the frame visible.
+     */
+    public void load() {
 
         JTextField usernameInput = new JTextField(15);
         usernameInput.setBounds(30,30,220,30);
@@ -33,11 +44,10 @@ public class TSBotLogin extends JFrame {
         passwordInput.setBounds(30,70,220,30);
         new GhostText("Password", passwordInput);
 
-
         JButton login = new JButton("Login");
         login.setBounds(150,110,100,30);
 
-        String[] messages = {"BITCHEEEEEEEEEEES", "YOU MOTHERFUCKING ASSHOLE", "YOU DENSE MOTHERFUCKER"};
+        String[] messages = {"BITCHEEEEEEEEEEES", "YOU MOTHERFUCKING ASSHOLES", "YOU DENSE MOTHERFUCKER"};
         JLabel motd = new JLabel("Message of the day: \"" + messages[(int) (Math.random() * messages.length)] + "\"");
         motd.setFont(new Font("Sans Serif", Font.PLAIN, 10));
         motd.setBounds(10,150, 300, 30);
