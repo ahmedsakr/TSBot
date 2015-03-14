@@ -92,7 +92,7 @@ public class TSBotLogin extends JFrame {
         JButton login = new JButton("Login");
         login.setBounds(150,110,100,30);
 
-        String[] messages = {"BITCHEEEEEEEEEEES", "YOU MOTHERFUCKING ASSHOLES", "YOU DENSE MOTHERFUCKER"};
+        String[] messages = {"place_holder_1", "place_holder_2", "place_holder_3"};
         JLabel motd = new JLabel("Message of the day: \"" + messages[(int) (Math.random() * messages.length)] + "\"");
         motd.setFont(new Font("Sans Serif", Font.PLAIN, 10));
         motd.setBackground(Color.DARK_GRAY);
