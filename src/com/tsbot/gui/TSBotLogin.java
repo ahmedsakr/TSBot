@@ -1,6 +1,8 @@
 package com.tsbot.gui;
 
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +59,36 @@ public class TSBotLogin extends JFrame {
         passwordInput.setBounds(30,70,220,30);
         new GhostText("Password", passwordInput);
 
+        JLabel exit = new JLabel("EXIT");
+        exit.setForeground(new Color(6,69,173));
+        exit.setBounds(100,110,30,30);
+        exit.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.exit(0);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
         JButton login = new JButton("Login");
         login.setBounds(150,110,100,30);
 
@@ -70,6 +102,7 @@ public class TSBotLogin extends JFrame {
 
         getContentPane().add(usernameInput);
         getContentPane().add(passwordInput);
+        getContentPane().add(exit);
         getContentPane().add(login);
         getContentPane().add(motd);
     }
