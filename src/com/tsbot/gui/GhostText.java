@@ -21,6 +21,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import javax.swing.text.JTextComponent;
 
 /**
@@ -32,6 +33,7 @@ public class GhostText implements FocusListener, KeyListener {
     private String text;
     private JTextComponent field;
     private Color oldForeground;
+    private Color ghostColor = new Color(0,0,0);
 
     
     /**
@@ -63,7 +65,7 @@ public class GhostText implements FocusListener, KeyListener {
     @Override
     public void focusGained(FocusEvent e) {
         if (field.getText().equalsIgnoreCase(text)) {
-            field.setForeground(Color.GRAY);
+            field.setForeground(ghostColor);
             field.setCaretPosition(0);
         }
     }
@@ -79,7 +81,7 @@ public class GhostText implements FocusListener, KeyListener {
     @Override
     public void focusLost(FocusEvent e) {
         if (field.getText().isEmpty()) {
-            field.setForeground(Color.GRAY);
+            field.setForeground(ghostColor);
             field.setText(text);
         }
     }
@@ -127,7 +129,7 @@ public class GhostText implements FocusListener, KeyListener {
     public void keyReleased(KeyEvent e) {
         if (field.getText().isEmpty()) {
             field.setText(text);
-            field.setForeground(Color.GRAY);
+            field.setForeground(ghostColor);
             field.setCaretPosition(0);
         }
     }

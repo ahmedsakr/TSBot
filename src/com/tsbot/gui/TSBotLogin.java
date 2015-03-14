@@ -1,7 +1,15 @@
 package com.tsbot.gui;
 
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 
@@ -17,16 +25,19 @@ public class TSBotLogin extends JFrame {
     /**
      * Constructor for {@link com.tsbot.gui.TSBotLogin}.
      * Builds the JFrame in question with the provided title.
-     *
-     * @param title the specified title of the frame.
      */
-    public TSBotLogin(String title) {
-        super(title);
+    public TSBotLogin() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(300, 200));
         setSize(getPreferredSize());
         setResizable(false);
-        setLayout(null);
+        setUndecorated(true);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBorder(new LineBorder(new Color(255,62,51)));
+
+        setContentPane(panel);
     }
 
 
@@ -38,9 +49,11 @@ public class TSBotLogin extends JFrame {
 
         JTextField usernameInput = new JTextField(15);
         usernameInput.setBounds(30,30,220,30);
+        usernameInput.setBackground(Color.GRAY);
         new GhostText("Username", usernameInput);
 
         JPasswordField passwordInput = new JPasswordField(15);
+        passwordInput.setBackground(Color.GRAY);
         passwordInput.setBounds(30,70,220,30);
         new GhostText("Password", passwordInput);
 
@@ -50,7 +63,10 @@ public class TSBotLogin extends JFrame {
         String[] messages = {"BITCHEEEEEEEEEEES", "YOU MOTHERFUCKING ASSHOLES", "YOU DENSE MOTHERFUCKER"};
         JLabel motd = new JLabel("Message of the day: \"" + messages[(int) (Math.random() * messages.length)] + "\"");
         motd.setFont(new Font("Sans Serif", Font.PLAIN, 10));
-        motd.setBounds(10,150, 300, 30);
+        motd.setBackground(Color.DARK_GRAY);
+        motd.setForeground(Color.WHITE);
+        motd.setOpaque(true);
+        motd.setBounds(0,150, 300, 30);
 
         getContentPane().add(usernameInput);
         getContentPane().add(passwordInput);

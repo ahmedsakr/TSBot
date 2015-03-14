@@ -6,6 +6,7 @@ import com.tsbot.gui.TSBotLogin;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+
 /**
  *
  * @author ahmad sakr
@@ -29,7 +30,7 @@ public class TSBot {
             e.printStackTrace();
         }
 
-        TSBotLogin gui = new TSBotLogin("TeamSpeak Bot - Login");
+        TSBotLogin gui = new TSBotLogin();
         gui.load();
         gui.setVisible(true);
         gui.setLocationRelativeTo(null);
