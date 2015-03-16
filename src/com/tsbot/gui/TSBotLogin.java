@@ -112,8 +112,12 @@ public class TSBotLogin extends JFrame {
 
             Username user = new Username(username);
             Password pass = new Password(password);
-            new BotAccessorOperator(this, user, pass);
+            BotAccessorOperator loginWorker = new BotAccessorOperator(this, user, pass);
             dispose();
+
+            loginWorker.setVisible(true);
+            loginWorker.setLocationRelativeTo(null);
+            loginWorker.work();
         });
 
         String[] messages = {"place_holder_1", "place_holder_2", "place_holder_3"};
