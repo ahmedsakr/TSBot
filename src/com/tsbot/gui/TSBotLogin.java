@@ -1,11 +1,15 @@
 package com.tsbot.gui;
 
 
+import com.tsbot.credentials.Password;
+import com.tsbot.credentials.Username;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -91,6 +95,26 @@ public class TSBotLogin extends JFrame {
 
         JButton login = new JButton("Login");
         login.setBounds(150,110,100,30);
+
+        login.addActionListener(a -> {
+            String username = usernameInput.getText();
+            char[] password = passwordInput.getPassword();
+
+            if (username.isEmpty() || username.equals("Username")) {
+                JOptionPane.showMessageDialog(this,
+                        "Username cannot be empty!", "Missing Input", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else if (password.length == 0 || Arrays.equals(password, "Password".toCharArray())) {
+                JOptionPane.showMessageDialog(this,
+                        "Password cannot be empty!", "Missing Input", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Username user = new Username(username);
+            Password pass = new Password(password);
+            new BotAccessorOperator(this, user, pass);
+            dispose();
+        });
 
         String[] messages = {"place_holder_1", "place_holder_2", "place_holder_3"};
         JLabel motd = new JLabel("Message of the day: \"" + messages[(int) (Math.random() * messages.length)] + "\"");
