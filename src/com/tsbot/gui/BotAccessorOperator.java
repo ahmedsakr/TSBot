@@ -1,10 +1,13 @@
 package com.tsbot.gui;
 
-import com.tsbot.credentials.Password;
-import com.tsbot.credentials.Username;
+import com.github.theholywaffle.teamspeak3.TS3Api;
+import com.github.theholywaffle.teamspeak3.TS3Config;
+import com.github.theholywaffle.teamspeak3.TS3Query;
+import com.tsbot.credentials.Credential;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
@@ -16,8 +19,7 @@ import javax.swing.JProgressBar;
 public class BotAccessorOperator extends JFrame {
 
     private TSBotLogin save;
-    private Username username;
-    private Password password;
+    private Credential serverAddress, serverPort, botNickname, queryUser, queryPass;
     private JProgressBar progress;
 
 
@@ -29,14 +31,21 @@ public class BotAccessorOperator extends JFrame {
      * Builds the frame for logging in the user.
      *
      *
-     * @param save the archived object of TSBotLogin, to be used if needed - otherwise to be nulled.
-     * @param username the Username object
-     * @param password the Password object
+     * @param save The archived object of TSBotLogin, to be used if needed - otherwise to be nulled.
+     * @param serverAddress The desired server address credential.
+     * @param serverPort the desired server port credential.
+     * @param botNickname The desired botNickname credential.
+     * @param queryUser The ServerQuery Username credential.
+     * @param queryPass The ServerQuery Password credential.
      */
-    public BotAccessorOperator(TSBotLogin save, Username username, Password password) {
+    public BotAccessorOperator(TSBotLogin save, Credential serverAddress, Credential serverPort, Credential botNickname,
+                               Credential queryUser, Credential queryPass) {
         this.save = save;
-        this.username = username;
-        this.password = password;
+        this.serverAddress = serverAddress;
+        this.serverPort = serverPort;
+        this.botNickname = botNickname;
+        this.queryUser = queryUser;
+        this.queryPass = queryPass;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
@@ -46,9 +55,8 @@ public class BotAccessorOperator extends JFrame {
 
         progress = new JProgressBar(0, 100);
         progress.setStringPainted(true);
-        progress.setForeground(Color.GREEN);
+        progress.setForeground(Color.ORANGE);
         progress.setString("Authenticating...");
-
         getContentPane().add(progress, "Center");
     }
 
@@ -62,6 +70,22 @@ public class BotAccessorOperator extends JFrame {
      * on a {@link javax.swing.JOptionPane}.
      */
     public void work() {
+        final TS3Config config = new TS3Config();
+        config.setHost(serverAddress.toString());
+        config.setDebugLevel(Level.ALL);
+        config.setLoginCredentials(queryUser.toString(), queryPass.toString());
 
+        final TS3Query query = new TS3Query(config);
+        query.connect();
+
+        final TS3Api api = query.getApi();
+        api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
+
+        progress.setValue(100);
+        progress.setString("Success!");
+
+        api.setNickname(botNickname.toString());
+
+        api.sendServerMessage("We are Anonymous. We are hidden. You will never find us");
     }
 }

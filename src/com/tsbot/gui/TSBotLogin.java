@@ -1,17 +1,14 @@
 package com.tsbot.gui;
 
 
-import com.tsbot.credentials.Password;
-import com.tsbot.credentials.Username;
+import com.tsbot.credentials.Credential;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
@@ -34,7 +31,7 @@ public class TSBotLogin extends JFrame {
      */
     public TSBotLogin() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(300, 200));
+        setPreferredSize(new Dimension(300, 350));
         setSize(getPreferredSize());
         setResizable(false);
         setUndecorated(true);
@@ -56,16 +53,32 @@ public class TSBotLogin extends JFrame {
         JTextField usernameInput = new JTextField(15);
         usernameInput.setBounds(30,30,220,30);
         usernameInput.setBackground(Color.GRAY);
-        new GhostText("Username", usernameInput);
+        new GhostText("Bot Nickname", usernameInput);
 
-        JPasswordField passwordInput = new JPasswordField(15);
-        passwordInput.setBackground(Color.GRAY);
-        passwordInput.setBounds(30,70,220,30);
-        new GhostText("Password", passwordInput);
+
+        JTextField serverAddress = new JTextField(15);
+        serverAddress.setBounds(30,90,220,30);
+        serverAddress.setBackground(Color.GRAY);
+        new GhostText("Server Address", serverAddress);
+
+        JTextField serverPort = new JTextField(15);
+        serverPort.setBounds(30, 130, 220, 30);
+        serverPort.setBackground(Color.GRAY);
+        new GhostText("Server Port", serverPort);
+
+        JTextField serverQueryUsername = new JTextField(15);
+        serverQueryUsername.setBounds(30,170,220,30);
+        serverQueryUsername.setBackground(Color.GRAY);
+        new GhostText("ServerQuery Username", serverQueryUsername);
+
+        JTextField serverQueryPassword = new JTextField(15);
+        serverQueryPassword.setBounds(30,210,220,30);
+        serverQueryPassword.setBackground(Color.GRAY);
+        new GhostText("ServerQuery Password", serverQueryPassword);
 
         JLabel exit = new JLabel("EXIT");
         exit.setForeground(new Color(6,69,173));
-        exit.setBounds(100,110,30,30);
+        exit.setBounds(100,260,30,30);
         exit.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -94,30 +107,31 @@ public class TSBotLogin extends JFrame {
         });
 
         JButton login = new JButton("Login");
-        login.setBounds(150,110,100,30);
+        login.setBounds(150,260,100,30);
 
         login.addActionListener(a -> {
             String username = usernameInput.getText();
-            char[] password = passwordInput.getPassword();
 
             if (username.isEmpty() || username.equals("Username")) {
                 JOptionPane.showMessageDialog(this,
                         "Username cannot be empty!", "Missing Input", JOptionPane.ERROR_MESSAGE);
                 return;
-            } else if (password.length == 0 || Arrays.equals(password, "Password".toCharArray())) {
-                JOptionPane.showMessageDialog(this,
-                        "Password cannot be empty!", "Missing Input", JOptionPane.ERROR_MESSAGE);
-                return;
             }
 
-            Username user = new Username(username);
-            Password pass = new Password(password);
-            BotAccessorOperator loginWorker = new BotAccessorOperator(this, user, pass);
+            Credential address = new Credential(serverAddress.getText());
+            Credential port = new Credential(serverPort.getText());
+            Credential botNickname = new Credential(username);
+            Credential queryUser = new Credential(serverQueryUsername.getText());
+            Credential queryPass = new Credential(serverQueryPassword.getText());
+
+            BotAccessorOperator loginWorker = new BotAccessorOperator(this, address, port, botNickname, queryUser,
+                    queryPass);
             dispose();
 
             loginWorker.setVisible(true);
             loginWorker.setLocationRelativeTo(null);
-            loginWorker.work();
+            Runnable run = loginWorker::work;
+            new Thread(run).start();
         });
 
         String[] messages = {"place_holder_1", "place_holder_2", "place_holder_3"};
@@ -126,10 +140,13 @@ public class TSBotLogin extends JFrame {
         motd.setBackground(Color.DARK_GRAY);
         motd.setForeground(Color.WHITE);
         motd.setOpaque(true);
-        motd.setBounds(0,150, 300, 30);
+        motd.setBounds(0,300, 300, 30);
 
         getContentPane().add(usernameInput);
-        getContentPane().add(passwordInput);
+        getContentPane().add(serverAddress);
+        getContentPane().add(serverPort);
+        getContentPane().add(serverQueryUsername);
+        getContentPane().add(serverQueryPassword);
         getContentPane().add(exit);
         getContentPane().add(login);
         getContentPane().add(motd);
