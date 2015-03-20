@@ -62,12 +62,7 @@ public class BotAccessorOperator extends JFrame {
 
 
     /**
-     * Handshaking with that database source begins here.
-     * In the following order: sends a request to check if the username exists. If so, then it will proceed to check
-     * if the password provided is equivalent to that of the username.
-     *
-     * If not, the user will be redirected to the original login frame with their corresponding error displayed
-     * on a {@link javax.swing.JOptionPane}.
+     * Establish a connection to the server that has been specified by the user.
      */
     public void work() {
         final TS3Config config = new TS3Config();
@@ -85,7 +80,5 @@ public class BotAccessorOperator extends JFrame {
         progress.setString("Success!");
 
         api.setNickname(botNickname.toString());
-
-        api.sendServerMessage("We are Anonymous. We are hidden. You will never find us");
     }
 }
