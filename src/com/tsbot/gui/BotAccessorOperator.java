@@ -53,7 +53,7 @@ public class BotAccessorOperator extends JFrame {
         setSize(getPreferredSize());
         setUndecorated(true);
 
-        progress = new JProgressBar(0, 100);
+        progress = new JProgressBar(0, 1);
         progress.setStringPainted(true);
         progress.setForeground(Color.ORANGE);
         progress.setString("Authenticating...");
@@ -67,7 +67,7 @@ public class BotAccessorOperator extends JFrame {
     public void work() {
         final TS3Config config = new TS3Config();
         config.setHost(serverAddress.toString());
-        config.setDebugLevel(Level.ALL);
+        config.setDebugLevel(Level.OFF);
         config.setLoginCredentials(queryUser.toString(), queryPass.toString());
 
         final TS3Query query = new TS3Query(config);
@@ -76,9 +76,17 @@ public class BotAccessorOperator extends JFrame {
         final TS3Api api = query.getApi();
         api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
-        progress.setValue(100);
+        progress.setValue(1);
         progress.setString("Success!");
 
         api.setNickname(botNickname.toString());
+
+        dispose();
+
+        TSControl control = new TSControl(api);
+        control.load();
+        control.setVisible(true);
+        control.setLocationRelativeTo(null);
+
     }
 }
