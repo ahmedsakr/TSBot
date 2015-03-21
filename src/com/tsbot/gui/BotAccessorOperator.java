@@ -3,6 +3,8 @@ package com.tsbot.gui;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
+import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
+import com.github.theholywaffle.teamspeak3.api.exception.TS3Exception;
 import com.tsbot.credentials.Credential;
 
 import java.awt.Color;
@@ -67,26 +69,30 @@ public class BotAccessorOperator extends JFrame {
     public void work() {
         final TS3Config config = new TS3Config();
         config.setHost(serverAddress.toString());
-        config.setDebugLevel(Level.OFF);
+        config.setDebugLevel(Level.ALL);
         config.setLoginCredentials(queryUser.toString(), queryPass.toString());
+        try {
+            final TS3Query query = new TS3Query(config);
+            query.connect();
 
-        final TS3Query query = new TS3Query(config);
-        query.connect();
+            final TS3Api api = query.getApi();
+            api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
-        final TS3Api api = query.getApi();
-        api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
-        progress.setValue(1);
-        progress.setString("Success!");
+            progress.setValue(1);
+            progress.setString("Success!");
 
-        api.setNickname(botNickname.toString());
+            api.setNickname(botNickname.toString());
 
-        dispose();
+            dispose();
 
-        TSControl control = new TSControl(api);
-        control.load();
-        control.setVisible(true);
-        control.setLocationRelativeTo(null);
+            TSControl control = new TSControl(api);
+            control.load();
+            control.setVisible(true);
+            control.setLocationRelativeTo(null);
 
+        } catch (TS3Exception e) {
+            System.out.println("kk");
+        }
     }
 }

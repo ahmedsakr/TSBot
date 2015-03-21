@@ -3,11 +3,19 @@ package com.tsbot.gui;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.github.theholywaffle.teamspeak3.api.wrapper.Permission;
+import com.github.theholywaffle.teamspeak3.api.wrapper.PermissionInfo;
+import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 /**
@@ -84,6 +92,62 @@ public class TSControl extends JFrame {
             pokeText.setText("");
         });
 
+        DefaultListModel model = new DefaultListModel();
+        JList onlineClients = new JList(model);
+        JScrollPane pane = new JScrollPane(onlineClients);
+        onlineClients.setBackground(Color.GRAY);
+        onlineClients.setSelectionBackground(Color.RED);
+        pane.setBounds(10, 120, 300, 240);
+        getContentPane().add(pane);
+
+        api.getClients().forEach((client) -> model.addElement(client.getNickname()));
+
+        JButton demote = new JButton("Demote");
+        demote.setBounds(320, 120, 150, 30);
+        getContentPane().add(demote);
+        demote.addActionListener(a -> {
+            Runnable run = () -> {
+                List<Client> selectedClients = new ArrayList<>();
+                for (int index : onlineClients.getSelectedIndices()) {
+                    selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
+                }
+
+                demote(selectedClients);
+            };
+
+            new Thread(run).start();
+        });
+
+
+        JButton ban = new JButton("Ban");
+        ban.setBounds(320, 160, 150, 30);
+        getContentPane().add(ban);
+        ban.addActionListener(a -> {
+
+            int seconds = Integer.valueOf(JOptionPane.showInputDialog(null,
+                    "Enter amount of hours to ban:", "Ban Time", JOptionPane.INFORMATION_MESSAGE));
+
+            if (seconds == 0)
+                return;
+
+            List<Client> selectedClients = new ArrayList<>();
+            for (int index : onlineClients.getSelectedIndices()) {
+                selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
+            }
+
+            ban(selectedClients, seconds);
+        });
+
+    }
+
+    private void demote(List<Client> clients) {
+        List<ServerGroup> groups = api.getServerGroups();
+        for (ServerGroup group : groups) {
+            if (group.getName().equalsIgnoreCase("Guest"))
+                continue;
+
+            clients.forEach((client) -> api.removeClientFromServerGroup(group.getId(), client.getDatabaseId()));
+        }
     }
 
 
@@ -107,5 +171,9 @@ public class TSControl extends JFrame {
 
     private void poke(List<Client> clients, String text) {
         clients.forEach(client -> api.pokeClient(client.getId(), text));
+    }
+
+    private void ban(List<Client> clients, int seconds) {
+        clients.forEach((client) -> api.banClient(client.getId(), seconds * 3600));
     }
 }
