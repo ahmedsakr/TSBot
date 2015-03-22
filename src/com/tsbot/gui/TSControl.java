@@ -121,17 +121,17 @@ public class TSControl extends JFrame {
 
         api.getClients().forEach((client) -> model.addElement(client.getNickname()));
 
-        JButton demote = new JButton("Demote");
-        demote.setBounds(320, 120, 150, 30);
-        getContentPane().add(demote);
-        demote.addActionListener(a -> {
+        JButton permissions = new JButton("Permissions");
+        permissions.setBounds(320, 120, 150, 30);
+        getContentPane().add(permissions);
+        permissions.addActionListener(a -> {
             Runnable run = () -> {
                 List<Client> selectedClients = new ArrayList<>();
                 for (int index : onlineClients.getSelectedIndices()) {
                     selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
                 }
 
-                functions.demote(selectedClients);
+                functions.permissions(selectedClients);
             };
 
             new Thread(run).start();

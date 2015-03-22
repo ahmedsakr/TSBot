@@ -4,10 +4,17 @@ import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
 
+import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 
@@ -33,22 +40,110 @@ public class Functions {
 
 
     /**
-     * Removes every single server group assigned to the selected clients - leaving them as guests.
+     * Loads the permissions for the selected clients, giving the operator an interface to
+     * deselect/select permissions the user should have.
      *
      * @param clients the clients to be acted upon.
      */
-    public void demote(List<Client> clients) {
-        List<ServerGroup> groups = api.getServerGroups();
-        for (Client client: clients) {
-            for (ServerGroup group : groups) {
-                if (group.getName().equalsIgnoreCase("Guest"))
-                    continue;
-
-                api.removeClientFromServerGroup(group.getId(), client.getDatabaseId());
-            }
-        }
+    public void permissions(List<Client> clients) {
+        loadPermissions(clients, api.getServerGroups());
     }
 
+
+    private void loadPermissions(List<Client> clients, List<ServerGroup> groups) {
+        if (clients.size() == 0) {
+            return;
+        }
+
+        JFrame frame = new JFrame("Change Permissions - " + clients.get(0).getNickname());
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(500,100);
+        frame.setResizable(false);
+
+
+        JPanel panel = new JPanel();
+
+        List<JCheckBox> permissions = new ArrayList<>();
+        List<Integer> permissionsId = new ArrayList<>();
+        for (ServerGroup group : groups) {
+            // TeamSpeak default server group ids not for users.
+            if (group.getId() < 10)
+                continue;
+
+            JCheckBox checkBox = new JCheckBox(group.getName());
+            checkBox.setFocusPainted(false);
+
+            for (int groupId : clients.get(0).getServerGroups()) {
+                if (groupId == group.getId()) {
+                    checkBox.setSelected(true);
+                }
+            }
+
+            permissions.add(checkBox);
+            permissionsId.add(group.getId());
+            panel.add(checkBox);
+        }
+
+
+        JScrollPane scroll = new JScrollPane(panel);
+        frame.getContentPane().add(scroll);
+
+        JPanel actions = new JPanel();
+        JCheckBox sameAction = null;
+
+        if (clients.size() > 1) {
+            sameAction = new JCheckBox("Same permissions for the next " + (clients.size() - 1 == 1 ?
+                    (clients.size() - 1 + " client") : (clients.size() - 1 + " clients")));
+            sameAction.setFocusPainted(false);
+            actions.add(sameAction);
+        }
+
+        JButton next = new JButton("Next");
+        next.setFocusPainted(false);
+        actions.add(next);
+
+        frame.getContentPane().add(actions, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+
+        final JCheckBox decisionValue = sameAction;
+        next.addActionListener((a) -> {
+            Runnable run = () -> {
+                if (decisionValue.isSelected()) {
+                    for (Client client : clients) {
+                        for (int i = 0; i < permissions.size(); i++) {
+                            if (permissions.get(i).isSelected()) {
+                                api.addClientToServerGroup(permissionsId.get(i), client.getDatabaseId());
+                            } else {
+                                api.removeClientFromServerGroup(permissionsId.get(i), client.getDatabaseId());
+                            }
+                        }
+                    }
+
+                    clients.clear();
+                    frame.dispose();
+                    loadPermissions(clients, groups);
+                } else {
+                    for (int i = 0; i < permissions.size(); i++) {
+                        if (permissions.get(i).isSelected()) {
+                            api.addClientToServerGroup(permissionsId.get(i), clients.get(0).getDatabaseId());
+                        } else {
+                            api.removeClientFromServerGroup(permissionsId.get(i), clients.get(0).getDatabaseId());
+                        }
+                    }
+
+                    clients.remove(0);
+                    frame.dispose();
+                    loadPermissions(clients, groups);
+                }
+
+
+            };
+
+            new Thread(run).start();
+        });
+    }
 
     /**
      * Sends a message to the main chat. (server)
