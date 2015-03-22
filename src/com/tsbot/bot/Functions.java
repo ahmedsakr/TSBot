@@ -110,7 +110,7 @@ public class Functions {
         final JCheckBox decisionValue = sameAction;
         next.addActionListener((a) -> {
             Runnable run = () -> {
-                if (decisionValue.isSelected()) {
+                if (decisionValue != null && decisionValue.isSelected()) {
                     for (Client client : clients) {
                         for (int i = 0; i < permissions.size(); i++) {
                             if (permissions.get(i).isSelected()) {
