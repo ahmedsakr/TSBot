@@ -3,13 +3,14 @@ package com.tsbot.gui;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import com.github.theholywaffle.teamspeak3.api.wrapper.Permission;
-import com.github.theholywaffle.teamspeak3.api.wrapper.PermissionInfo;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
+import com.tsbot.bot.Functions;
+
 import java.awt.Color;
 import java.awt.Dimension;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +18,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+
 
 /**
  *
@@ -26,10 +28,21 @@ import javax.swing.JTextField;
 public class TSControl extends JFrame {
 
     private TS3Api api;
+    private Functions functions;
 
+
+    /**
+     * Constructor for {@link com.tsbot.gui.TSControl}.
+     * After the user has been admitted access to the bot, the user is ready to start
+     * utilizing all functions and features the bot has to offer. In result, build the frame
+     * and display it to the user.
+     *
+     * @param api the corresponding api for the provided server.
+     */
     public TSControl(TS3Api api) {
         super("TSBot - Control");
         this.api = api;
+        functions = new Functions(this.api);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(500,400));
@@ -39,6 +52,12 @@ public class TSControl extends JFrame {
     }
 
 
+    /**
+     * CRITICAL: TSControl#load() has to be called for the constitutes of the frame to appear!
+     * The constructor only builds the frame itself, not it's expected components.
+     *
+     * That being said, this delivers the content to the frame itself.
+     */
     public void load() {
         JTextField chatArea = new JTextField(15);
         chatArea.setBounds(10, 10, 300, 40);
@@ -48,12 +67,12 @@ public class TSControl extends JFrame {
         JButton serverChat = new JButton("Send Server Chat");
         serverChat.setBounds(320, 10, 150, 20);
         getContentPane().add(serverChat);
-        serverChat.addActionListener(a -> sendServerMessage(chatArea));
+        serverChat.addActionListener(a -> functions.sendServerMessage(chatArea));
 
         JButton channelChat = new JButton("Send Channel Chat");
         channelChat.setBounds(320, 30, 150, 20);
         getContentPane().add(channelChat);
-        channelChat.addActionListener(a -> sendChannelMessage(chatArea));
+        channelChat.addActionListener(a -> functions.sendChannelMessage(chatArea));
 
         JTextField pokeText = new JTextField(15);
         pokeText.setBounds(10,60,300,40);
@@ -68,7 +87,7 @@ public class TSControl extends JFrame {
             if (pokeText.getText().isEmpty() || pokeText.getText().equalsIgnoreCase("Enter Poke Text..."))
                 return;
 
-            Runnable r = () -> poke(api.getClients(), pokeText.getText());
+            Runnable r = () -> functions.poke(api.getClients(), pokeText.getText());
             new Thread(r).start();
             pokeText.setText("");
         });
@@ -87,7 +106,7 @@ public class TSControl extends JFrame {
             if (client == null || client.isEmpty())
                 return;
 
-            Runnable r = () -> poke(api.getClientByName(client), pokeText.getText());
+            Runnable r = () -> functions.poke(api.getClientByName(client), pokeText.getText());
             new Thread(r).start();
             pokeText.setText("");
         });
@@ -97,7 +116,7 @@ public class TSControl extends JFrame {
         JScrollPane pane = new JScrollPane(onlineClients);
         onlineClients.setBackground(Color.GRAY);
         onlineClients.setSelectionBackground(Color.RED);
-        pane.setBounds(10, 120, 300, 240);
+        pane.setBounds(10, 120, 300, 150);
         getContentPane().add(pane);
 
         api.getClients().forEach((client) -> model.addElement(client.getNickname()));
@@ -112,7 +131,7 @@ public class TSControl extends JFrame {
                     selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
                 }
 
-                demote(selectedClients);
+                functions.demote(selectedClients);
             };
 
             new Thread(run).start();
@@ -130,50 +149,21 @@ public class TSControl extends JFrame {
             if (seconds == 0)
                 return;
 
-            List<Client> selectedClients = new ArrayList<>();
-            for (int index : onlineClients.getSelectedIndices()) {
-                selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
-            }
+            Runnable run = () -> {
+                List<Client> selectedClients = new ArrayList<>();
+                for (int index : onlineClients.getSelectedIndices()) {
+                    selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
+                }
 
-            ban(selectedClients, seconds);
+                functions.ban(selectedClients, seconds);
+            };
+
+            new Thread(run).start();
         });
 
-    }
-
-    private void demote(List<Client> clients) {
-        List<ServerGroup> groups = api.getServerGroups();
-        for (ServerGroup group : groups) {
-            if (group.getName().equalsIgnoreCase("Guest"))
-                continue;
-
-            clients.forEach((client) -> api.removeClientFromServerGroup(group.getId(), client.getDatabaseId()));
-        }
-    }
-
-
-    private void sendServerMessage(JTextField field) {
-
-        if (field.getText().isEmpty() || field.getText().equalsIgnoreCase("Send A Message..."))
-            return;
-
-        api.sendServerMessage(field.getText());
-        field.setText("");
-    }
-
-    private void sendChannelMessage(JTextField field) {
-
-        if (field.getText().isEmpty() || field.getText().equalsIgnoreCase("Send A Message..."))
-            return;
-
-        api.sendChannelMessage(field.getText());
-        field.setText("");
-    }
-
-    private void poke(List<Client> clients, String text) {
-        clients.forEach(client -> api.pokeClient(client.getId(), text));
-    }
-
-    private void ban(List<Client> clients, int seconds) {
-        clients.forEach((client) -> api.banClient(client.getId(), seconds * 3600));
+        JButton refresh = new JButton("Refresh Clients");
+        refresh.setBounds(320, 200, 150, 30);
+        getContentPane().add(refresh);
+        refresh.addActionListener(a -> functions.refreshClients(onlineClients, api.getClients()));
     }
 }

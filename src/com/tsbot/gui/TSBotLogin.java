@@ -130,7 +130,13 @@ public class TSBotLogin extends JFrame {
 
             loginWorker.setVisible(true);
             loginWorker.setLocationRelativeTo(null);
-            Runnable run = loginWorker::work;
+            Runnable run = () -> {
+                try {
+                    loginWorker.work();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            };
             new Thread(run).start();
         });
 

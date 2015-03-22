@@ -4,7 +4,6 @@ import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
-import com.github.theholywaffle.teamspeak3.api.exception.TS3Exception;
 import com.tsbot.credentials.Credential;
 
 import java.awt.Color;
@@ -66,33 +65,46 @@ public class BotAccessorOperator extends JFrame {
     /**
      * Establish a connection to the server that has been specified by the user.
      */
-    public void work() {
-        final TS3Config config = new TS3Config();
+    public void work() throws InterruptedException {
+        TS3Config config = new TS3Config();
         config.setHost(serverAddress.toString());
         config.setDebugLevel(Level.ALL);
         config.setLoginCredentials(queryUser.toString(), queryPass.toString());
+
+        TS3Query query = null;
+
         try {
-            final TS3Query query = new TS3Query(config);
+
+            query = new TS3Query(config);
             query.connect();
 
-            final TS3Api api = query.getApi();
-            api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
+        } catch (TS3ConnectionFailedException e) {
 
-
+            progress.setForeground(Color.RED);
             progress.setValue(1);
-            progress.setString("Success!");
+            progress.setString("Failed!");
 
-            api.setNickname(botNickname.toString());
-
+            Thread.sleep(1000);
             dispose();
 
-            TSControl control = new TSControl(api);
-            control.load();
-            control.setVisible(true);
-            control.setLocationRelativeTo(null);
+            save.setVisible(true);
+            query.exit();
+            config = null;
 
-        } catch (TS3Exception e) {
-            System.out.println("kk");
+            return;
         }
+
+        TS3Api api = query.getApi();
+        api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
+
+        progress.setValue(1);
+        progress.setString("Success!");
+        api.setNickname(botNickname.toString());
+        dispose();
+
+        TSControl control = new TSControl(api);
+        control.load();
+        control.setVisible(true);
+        control.setLocationRelativeTo(null);
     }
 }
