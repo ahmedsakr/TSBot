@@ -106,7 +106,7 @@ public class TSControl extends JFrame {
             if (client == null || client.isEmpty())
                 return;
 
-            Runnable r = () -> functions.poke(api.getClientByName(client), pokeText.getText());
+            Runnable r = () -> functions.poke(api.getClientByNameExact(client, true), pokeText.getText());
             new Thread(r).start();
             pokeText.setText("");
         });
@@ -128,7 +128,7 @@ public class TSControl extends JFrame {
             Runnable run = () -> {
                 List<Client> selectedClients = new ArrayList<>();
                 for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
+                    selectedClients.add(api.getClientByNameExact(model.get(index).toString(), true));
                 }
 
                 functions.permissions(selectedClients);
@@ -152,7 +152,7 @@ public class TSControl extends JFrame {
             Runnable run = () -> {
                 List<Client> selectedClients = new ArrayList<>();
                 for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(api.getClientByName(model.get(index).toString()).get(0));
+                    selectedClients.add(api.getClientByNameExact(model.get(index).toString(), true));
                 }
 
                 functions.ban(selectedClients, seconds);

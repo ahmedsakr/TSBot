@@ -46,25 +46,33 @@ public class Functions {
      * @param clients the clients to be acted upon.
      */
     public void permissions(List<Client> clients) {
-        loadPermissions(clients, api.getServerGroups());
+        permissions(clients, api.getServerGroups());
     }
 
 
-    private void loadPermissions(List<Client> clients, List<ServerGroup> groups) {
+    /**
+     * Loads the permissions for the selected clients, giving the operator an interface to
+     * deselect/select permissions the user should have.
+     * The current client's server groups are displayed automatically to display occupied server groups.
+     *
+     * @param clients the clients to be acted upon.
+     * @param groups  the groups to act upon.
+     */
+    private void permissions(List<Client> clients, List<ServerGroup> groups) {
         if (clients.size() == 0) {
             return;
         }
 
-        JFrame frame = new JFrame("Change Permissions - " + clients.get(0).getNickname());
+        JFrame frame = new JFrame("Permissions - " + clients.get(0).getNickname());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(500,100);
         frame.setResizable(false);
-
 
         JPanel panel = new JPanel();
 
         List<JCheckBox> permissions = new ArrayList<>();
         List<Integer> permissionsId = new ArrayList<>();
+
         for (ServerGroup group : groups) {
             // TeamSpeak default server group ids not for users.
             if (group.getId() < 10)
@@ -106,11 +114,10 @@ public class Functions {
 
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
-
-        final JCheckBox decisionValue = sameAction;
+        boolean isSamePermissions = sameAction != null;
         next.addActionListener((a) -> {
             Runnable run = () -> {
-                if (decisionValue != null && decisionValue.isSelected()) {
+                if (isSamePermissions) {
                     for (Client client : clients) {
                         for (int i = 0; i < permissions.size(); i++) {
                             if (permissions.get(i).isSelected()) {
@@ -123,7 +130,7 @@ public class Functions {
 
                     clients.clear();
                     frame.dispose();
-                    loadPermissions(clients, groups);
+                    permissions(clients, groups);
                 } else {
                     for (int i = 0; i < permissions.size(); i++) {
                         if (permissions.get(i).isSelected()) {
@@ -135,15 +142,14 @@ public class Functions {
 
                     clients.remove(0);
                     frame.dispose();
-                    loadPermissions(clients, groups);
+                    permissions(clients, groups);
                 }
-
-
             };
 
             new Thread(run).start();
         });
     }
+
 
     /**
      * Sends a message to the main chat. (server)
@@ -183,6 +189,17 @@ public class Functions {
      */
     public void poke(List<Client> clients, String text) {
         clients.forEach(client -> api.pokeClient(client.getId(), text));
+    }
+
+
+    /**
+     * Pokes all the clients in the List clients with the message text.
+     *
+     * @param client the client being poked.
+     * @param text    the associated text of the poke.
+     */
+    public void poke(Client client, String text) {
+        api.pokeClient(client.getId(), text);
     }
 
 

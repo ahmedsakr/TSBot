@@ -106,5 +106,10 @@ public class BotAccessorOperator extends JFrame {
         control.load();
         control.setVisible(true);
         control.setLocationRelativeTo(null);
+
+        DeveloperConsole console = new DeveloperConsole();
+        console.setVisible(true);
+        console.setLocationRelativeTo(control);
+        console.setLocation(0, 0);
     }
 }
