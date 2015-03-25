@@ -3,6 +3,9 @@ package com.tsbot.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -40,6 +43,21 @@ public class DeveloperConsole extends JFrame {
 
         JButton dump = new JButton("Dump");
         getContentPane().add(dump, BorderLayout.SOUTH);
+
+        dump.addActionListener((a) -> {
+            int index = 1;
+            String desktop = System.getProperty("user.home") + "/Desktop/";
+            File file = new File(desktop + "tsbot_dump.txt");
+            while (file.exists()) {
+                file = new File(desktop + "tsbot_dump" + index++ + ".txt");
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file.getPath()))) {
+                textArea.write(bw);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
 
