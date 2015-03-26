@@ -44,7 +44,7 @@ public class TSControl extends JFrame {
         this.api = api;
         functions = new Functions(this.api);
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(500,400));
         setSize(getPreferredSize());
         setResizable(false);

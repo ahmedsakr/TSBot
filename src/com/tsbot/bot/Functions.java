@@ -3,12 +3,11 @@ package com.tsbot.bot;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
+import javax.swing.*;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
 
 
 /**
