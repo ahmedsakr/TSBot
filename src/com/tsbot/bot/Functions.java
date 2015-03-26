@@ -8,14 +8,7 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 
 /**
@@ -199,7 +192,12 @@ public class Functions {
      * @param text    the associated text of the poke.
      */
     public void poke(Client client, String text) {
-        api.pokeClient(client.getId(), text);
+        if (client == null) {
+            JOptionPane.showMessageDialog(null,
+                    "The Specified client is not online.", "Client Offline", JOptionPane.ERROR_MESSAGE);
+        } else {
+            api.pokeClient(client.getId(), text);
+        }
     }
 
 
