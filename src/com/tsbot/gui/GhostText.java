@@ -64,7 +64,7 @@ public class GhostText implements FocusListener, KeyListener {
      */
     @Override
     public void focusGained(FocusEvent e) {
-        if (field.getText().equalsIgnoreCase(text)) {
+        if (field.getText().equals(text)) {
             field.setForeground(ghostColor);
             field.setCaretPosition(0);
         }
@@ -132,5 +132,11 @@ public class GhostText implements FocusListener, KeyListener {
             field.setForeground(ghostColor);
             field.setCaretPosition(0);
         }
+    }
+
+
+
+    public String toString() {
+        return text;
     }
 }

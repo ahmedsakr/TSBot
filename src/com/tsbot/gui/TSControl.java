@@ -105,22 +105,28 @@ public class TSControl extends JFrame {
     public void load() {
         JTextField chatArea = new JTextField(15);
         chatArea.setBounds(10, 10, 300, 40);
-        new GhostText("Send A Message...", chatArea);
+        GhostText chatDisplayText = new GhostText("Send A Message...", chatArea);
         getContentPane().add(chatArea);
 
         JButton serverChat = new JButton("Send Server Chat");
         serverChat.setBounds(320, 10, 150, 20);
         getContentPane().add(serverChat);
-        serverChat.addActionListener(a -> functions.sendServerMessage(chatArea));
+        serverChat.addActionListener(a -> {
+            functions.sendServerMessage(chatArea);
+            chatArea.setText(chatDisplayText.toString());
+        });
 
         JButton channelChat = new JButton("Send Channel Chat");
         channelChat.setBounds(320, 30, 150, 20);
         getContentPane().add(channelChat);
-        channelChat.addActionListener(a -> functions.sendChannelMessage(chatArea));
+        channelChat.addActionListener(a -> {
+            functions.sendChannelMessage(chatArea);
+            chatArea.setText(chatDisplayText.toString());
+        });
 
         JTextField pokeText = new JTextField(15);
         pokeText.setBounds(10,60,300,40);
-        new GhostText("Enter Poke Text...", pokeText);
+        GhostText pokeDisplayText = new GhostText("Enter Poke Text...", pokeText);
         getContentPane().add(pokeText);
 
         JButton pokeAll = new JButton("Poke All");
@@ -133,7 +139,7 @@ public class TSControl extends JFrame {
 
             Runnable r = () -> functions.poke(api.getClients(), pokeText.getText());
             new Thread(r).start();
-            pokeText.setText("");
+            pokeText.setText(pokeDisplayText.toString());
         });
 
         JButton pokeClient = new JButton("Poke Client");
@@ -152,7 +158,7 @@ public class TSControl extends JFrame {
 
             Runnable r = () -> functions.poke(api.getClientByNameExact(client, true), pokeText.getText());
             new Thread(r).start();
-            pokeText.setText("");
+            pokeText.setText(pokeDisplayText.toString());
         });
 
         DefaultListModel model = new DefaultListModel();
@@ -209,9 +215,14 @@ public class TSControl extends JFrame {
             new Thread(run).start();
         });
 
+        JButton banList = new JButton("Ban List");
+        banList.setBounds(320, 200, 150, 30);
+        getContentPane().add(banList);
+
+
         JButton refresh = new JButton("Refresh Clients");
-        refresh.setBounds(320, 200, 150, 30);
+        refresh.setBounds(320, 240, 150, 30);
         getContentPane().add(refresh);
-        refresh.addActionListener(a -> functions.refreshClients(onlineClients, api.getClients()));
+        refresh.addActionListener(a -> functions.refreshClients(onlineClients, api.getClients(), botNickname));
     }
 }

@@ -18,6 +18,7 @@ $RECYCLE.BIN/
 *.iml
 # Windows shortcuts
 *.lnk
+*.jar
 
 # =========================
 # Operating System Files

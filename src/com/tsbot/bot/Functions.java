@@ -229,11 +229,13 @@ public class Functions {
      * @param list the list to update the elements in.
      * @param clients the updated online clients.
      */
-    public void refreshClients(JList list, List<Client> clients) {
+    public void refreshClients(JList list, List<Client> clients, String botNickname) {
         DefaultListModel model = (DefaultListModel) list.getModel();
         model.removeAllElements();
         for (Client client: clients) {
-            model.addElement(client.getNickname());
+            if (!client.getNickname().equalsIgnoreCase(botNickname)) {
+                model.addElement(client.getNickname());
+            }
         }
 
         list.setModel(model);
