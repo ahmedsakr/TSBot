@@ -64,6 +64,7 @@ public class BotAccessorOperator extends JFrame {
 
     /**
      * Establish a connection to the server that has been specified by the user.
+     * TODO rewrite the work method, it's horribly written.
      */
     public void work() throws InterruptedException {
         TS3Config config = new TS3Config();
@@ -78,8 +79,25 @@ public class BotAccessorOperator extends JFrame {
             query = new TS3Query(config);
             query.connect();
 
-        } catch (TS3ConnectionFailedException e) {
+            TS3Api api = query.getApi();
+            api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
+            progress.setValue(1);
+            progress.setString("Success!");
+            api.setNickname(botNickname.toString());
+            dispose();
+
+            TSControl control = new TSControl(api, botNickname.toString());
+            control.load();
+            control.setVisible(true);
+            control.setLocationRelativeTo(null);
+
+            DeveloperConsole console = new DeveloperConsole();
+            console.setVisible(true);
+            console.setLocationRelativeTo(control);
+            console.setLocation(0, 0);
+        } catch (TS3ConnectionFailedException | NullPointerException e) {
+            e.printStackTrace();
             progress.setForeground(Color.RED);
             progress.setValue(1);
             progress.setString("Failed!");
@@ -90,26 +108,8 @@ public class BotAccessorOperator extends JFrame {
             save.setVisible(true);
             query.exit();
             config = null;
-
-            return;
         }
 
-        TS3Api api = query.getApi();
-        api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
-        progress.setValue(1);
-        progress.setString("Success!");
-        api.setNickname(botNickname.toString());
-        dispose();
-
-        TSControl control = new TSControl(api);
-        control.load();
-        control.setVisible(true);
-        control.setLocationRelativeTo(null);
-
-        DeveloperConsole console = new DeveloperConsole();
-        console.setVisible(true);
-        console.setLocationRelativeTo(control);
-        console.setLocation(0, 0);
     }
 }

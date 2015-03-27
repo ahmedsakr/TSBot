@@ -3,7 +3,16 @@ package com.tsbot.bot;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
-import javax.swing.*;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -55,7 +64,9 @@ public class Functions {
             return;
         }
 
-        JFrame frame = new JFrame("Permissions - " + clients.get(0).getNickname());
+        Client currentClient = clients.get(0);
+
+        JFrame frame = new JFrame("Permissions - " + currentClient.getNickname());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(500,100);
         frame.setResizable(false);
@@ -73,7 +84,7 @@ public class Functions {
             JCheckBox checkBox = new JCheckBox(group.getName());
             checkBox.setFocusPainted(false);
 
-            for (int groupId : clients.get(0).getServerGroups()) {
+            for (int groupId : currentClient.getServerGroups()) {
                 if (groupId == group.getId()) {
                     checkBox.setSelected(true);
                 }
@@ -122,7 +133,6 @@ public class Functions {
 
                     clients.clear();
                     frame.dispose();
-                    permissions(clients, groups);
                 } else {
                     for (int i = 0; i < permissions.size(); i++) {
                         if (permissions.get(i).isSelected()) {
@@ -180,12 +190,12 @@ public class Functions {
      * @param text    the associated text of the poke.
      */
     public void poke(List<Client> clients, String text) {
-        clients.forEach(client -> api.pokeClient(client.getId(), text));
+        clients.forEach(client -> poke(client, text));
     }
 
 
     /**
-     * Pokes all the clients in the List clients with the message text.
+     * Pokes a certain client specified in the param arguments with the certain text.
      *
      * @param client the client being poked.
      * @param text    the associated text of the poke.

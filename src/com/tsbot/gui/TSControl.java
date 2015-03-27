@@ -8,6 +8,8 @@ import com.tsbot.bot.Functions;
 import java.awt.Color;
 import java.awt.Dimension;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class TSControl extends JFrame {
 
     private TS3Api api;
     private Functions functions;
+    private String botNickname;
 
 
     /**
@@ -38,17 +41,58 @@ public class TSControl extends JFrame {
      * and display it to the user.
      *
      * @param api the corresponding api for the provided server.
+     * @param botNickname the bot's nickname.
      */
-    public TSControl(TS3Api api) {
+    public TSControl(TS3Api api, String botNickname) {
         super("TSBot - Control");
         this.api = api;
+        this.botNickname = botNickname;
         functions = new Functions(this.api);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(500,400));
+        setPreferredSize(new Dimension(500, 400));
         setSize(getPreferredSize());
         setResizable(false);
         getContentPane().setLayout(null);
+
+        addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (api != null) {
+                    api.logout();
+                }
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+
+            }
+        });
     }
 
 
@@ -119,7 +163,11 @@ public class TSControl extends JFrame {
         pane.setBounds(10, 120, 300, 150);
         getContentPane().add(pane);
 
-        api.getClients().forEach((client) -> model.addElement(client.getNickname()));
+        api.getClients().forEach((client) -> {
+            if (!client.getNickname().equalsIgnoreCase(botNickname)) {
+                model.addElement(client.getNickname());
+            }
+        });
 
         JButton permissions = new JButton("Permissions");
         permissions.setBounds(320, 120, 150, 30);
