@@ -27,7 +27,7 @@ public class DeveloperConsole extends JFrame {
     public DeveloperConsole() {
         super("TSBot - Developer Console");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(400,400);
+        setSize(500,400);
         setResizable(false);
 
         JTextArea textArea = new JTextArea();
@@ -39,7 +39,10 @@ public class DeveloperConsole extends JFrame {
 
         getContentPane().add(scroll);
 
-        System.setOut(new PrintStream(new TSBotOutputStream(textArea)));
+        TSBotOutputStream output = new TSBotOutputStream(textArea);
+
+        System.setOut(new PrintStream(output));
+        System.setErr(new PrintStream(output));
 
         JButton dump = new JButton("Dump");
         getContentPane().add(dump, BorderLayout.SOUTH);

@@ -101,14 +101,19 @@ public class BotAccessorOperator extends JFrame {
             progress.setString("Success! Loading...");
             api.setNickname(botNickname.toString());
 
-            TSControl control = new TSControl(api, botNickname.toString());
-            control.load();
-            control.setVisible(true);
-            control.setLocationRelativeTo(null);
-
             DeveloperConsole console = new DeveloperConsole();
             console.setVisible(true);
             console.setLocation(0, 0);
+
+            InputProcessing input = new InputProcessing();
+            input.load();
+            input.setVisible(true);
+            input.setLocation(0, console.getHeight() + 10);
+
+            TSControl control = new TSControl(api, botNickname.toString());
+            control.load();
+            control.setVisible(true);
+            control.setLocation(console.getWidth() + 200, console.getHeight() / 2);
 
             dispose();
         }

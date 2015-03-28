@@ -230,10 +230,19 @@ public class TSControl extends JFrame {
         banList.setBounds(320, 200, 150, 30);
         getContentPane().add(banList);
 
-
         JButton refresh = new JButton("Refresh Clients");
         refresh.setBounds(320, 240, 150, 30);
         getContentPane().add(refresh);
         refresh.addActionListener(a -> functions.refreshClients(onlineClients, api.getClients(), botNickname));
+
+        JButton inputIntelligence = new JButton("Input Intelligence");
+        inputIntelligence.setBounds(10, 280, 150, 30);
+        getContentPane().add(inputIntelligence);
+        inputIntelligence.addActionListener((a) -> {
+            InputProcessing input = new InputProcessing();
+            input.load();
+            input.setVisible(true);
+            input.setLocationRelativeTo(null);
+        });
     }
 }
