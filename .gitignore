@@ -19,6 +19,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.jar
+api reference/
 
 # =========================
 # Operating System Files

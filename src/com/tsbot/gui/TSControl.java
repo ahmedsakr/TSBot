@@ -3,6 +3,7 @@ package com.tsbot.gui;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.tsbot.bot.CommandListener;
 import com.tsbot.bot.Functions;
 
 import java.awt.Color;
@@ -47,7 +48,10 @@ public class TSControl extends JFrame {
         super("TSBot - Control");
         this.api = api;
         this.botNickname = botNickname;
+
         functions = new Functions(this.api);
+        this.api.registerAllEvents();
+        this.api.addTS3Listeners(new CommandListener(this.api, botNickname));
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(500, 400));
@@ -137,9 +141,12 @@ public class TSControl extends JFrame {
             if (pokeText.getText().isEmpty() || pokeText.getText().equalsIgnoreCase("Enter Poke Text..."))
                 return;
 
-            Runnable r = () -> functions.poke(api.getClients(), pokeText.getText());
+            Runnable r = () -> {
+                functions.poke(api.getClients(), pokeText.getText());
+                pokeText.setText(pokeDisplayText.toString());
+            };
+
             new Thread(r).start();
-            pokeText.setText(pokeDisplayText.toString());
         });
 
         JButton pokeClient = new JButton("Poke Client");
@@ -156,9 +163,13 @@ public class TSControl extends JFrame {
             if (client == null || client.isEmpty())
                 return;
 
-            Runnable r = () -> functions.poke(api.getClientByNameExact(client, true), pokeText.getText());
+            Runnable r = () -> {
+                functions.poke(api.getClientByNameExact(client, true), pokeText.getText());
+                pokeText.setText(pokeDisplayText.toString());
+            };
+
             new Thread(r).start();
-            pokeText.setText(pokeDisplayText.toString());
+
         });
 
         DefaultListModel model = new DefaultListModel();

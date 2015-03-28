@@ -10,7 +10,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.logging.Level;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 
 /**
  *
@@ -50,14 +52,20 @@ public class BotAccessorOperator extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
-        setPreferredSize(new Dimension(200,50));
+        setPreferredSize(new Dimension(200, 50));
         setSize(getPreferredSize());
         setUndecorated(true);
 
         progress = new JProgressBar(0, 1);
         progress.setStringPainted(true);
-        progress.setForeground(Color.ORANGE);
+        progress.setForeground(Color.GREEN);
         progress.setString("Authenticating...");
+
+        progress.setUI(new BasicProgressBarUI() {
+            protected Color getSelectionBackground() { return Color.BLACK; }
+            protected Color getSelectionForeground() { return Color.BLACK; }
+        });
+
         getContentPane().add(progress, "Center");
     }
 
@@ -70,22 +78,28 @@ public class BotAccessorOperator extends JFrame {
         TS3Config config = new TS3Config();
         config.setHost(serverAddress.toString());
         config.setDebugLevel(Level.ALL);
+        config.setFloodRate(TS3Query.FloodRate.UNLIMITED);
         config.setLoginCredentials(queryUser.toString(), queryPass.toString());
 
-        TS3Query query = null;
+        TS3Query query = new TS3Query(config);
+        query.connect();
 
-        try {
+        TS3Api api = query.getApi();
+        api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
-            query = new TS3Query(config);
-            query.connect();
+        if (!isConnected(api)) {
 
-            TS3Api api = query.getApi();
-            api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
+            dispose();
+            save.setVisible(true);
+            query.exit();
+            config = null;
+            JOptionPane.showMessageDialog(save, "Connection to " + serverAddress + " failed." +
+                    " Make sure you input the correct ServerQuery credentials.");
+        } else {
 
             progress.setValue(1);
-            progress.setString("Success!");
+            progress.setString("Success! Loading...");
             api.setNickname(botNickname.toString());
-            dispose();
 
             TSControl control = new TSControl(api, botNickname.toString());
             control.load();
@@ -94,22 +108,14 @@ public class BotAccessorOperator extends JFrame {
 
             DeveloperConsole console = new DeveloperConsole();
             console.setVisible(true);
-            console.setLocationRelativeTo(control);
             console.setLocation(0, 0);
-        } catch (TS3ConnectionFailedException | NullPointerException e) {
-            e.printStackTrace();
-            progress.setForeground(Color.RED);
-            progress.setValue(1);
-            progress.setString("Failed!");
 
-            Thread.sleep(1000);
             dispose();
-
-            save.setVisible(true);
-            query.exit();
-            config = null;
         }
+    }
 
 
+    private boolean isConnected(TS3Api api) {
+        return api != null && api.getClients() != null;
     }
 }
