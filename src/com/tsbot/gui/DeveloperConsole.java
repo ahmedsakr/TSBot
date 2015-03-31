@@ -28,7 +28,6 @@ public class DeveloperConsole extends JFrame {
         super("TSBot - Developer Console");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500,400);
-        setResizable(false);
 
         JTextArea textArea = new JTextArea();
         DefaultCaret caret = (DefaultCaret)textArea.getCaret();

@@ -3,7 +3,6 @@ package com.tsbot.gui;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
-import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.tsbot.credentials.Credential;
 
 import java.awt.Color;
@@ -106,12 +105,10 @@ public class BotAccessorOperator extends JFrame {
             console.setLocation(0, 0);
 
             InputProcessing input = new InputProcessing();
-            input.load();
             input.setVisible(true);
             input.setLocation(0, console.getHeight() + 10);
 
             TSControl control = new TSControl(api, botNickname.toString());
-            control.load();
             control.setVisible(true);
             control.setLocation(console.getWidth() + 200, console.getHeight() / 2);
 

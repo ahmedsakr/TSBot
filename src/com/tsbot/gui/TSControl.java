@@ -11,6 +11,10 @@ import java.awt.Dimension;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +53,7 @@ public class TSControl extends JFrame {
         this.api = api;
         this.botNickname = botNickname;
 
-        functions = new Functions(this.api);
+        this.functions = new Functions(this.api);
         this.api.registerAllEvents();
         this.api.addTS3Listeners(new CommandListener(this.api, botNickname));
 
@@ -97,16 +101,15 @@ public class TSControl extends JFrame {
 
             }
         });
+
+        components();
     }
 
 
     /**
-     * CRITICAL: TSControl#load() has to be called for the constitutes of the frame to appear!
-     * The constructor only builds the frame itself, not it's expected components.
-     *
-     * That being said, this delivers the content to the frame itself.
+     * Loads all the components onto the frame.
      */
-    public void load() {
+    private void components() {
         JTextField chatArea = new JTextField(15);
         chatArea.setBounds(10, 10, 300, 40);
         GhostText chatDisplayText = new GhostText("Send A Message...", chatArea);
@@ -116,7 +119,7 @@ public class TSControl extends JFrame {
         serverChat.setBounds(320, 10, 150, 20);
         getContentPane().add(serverChat);
         serverChat.addActionListener(a -> {
-            functions.sendServerMessage(chatArea);
+            this.functions.sendServerMessage(chatArea);
             chatArea.setText(chatDisplayText.toString());
         });
 
@@ -124,7 +127,7 @@ public class TSControl extends JFrame {
         channelChat.setBounds(320, 30, 150, 20);
         getContentPane().add(channelChat);
         channelChat.addActionListener(a -> {
-            functions.sendChannelMessage(chatArea);
+            this.functions.sendChannelMessage(chatArea);
             chatArea.setText(chatDisplayText.toString());
         });
 
@@ -142,7 +145,7 @@ public class TSControl extends JFrame {
                 return;
 
             Runnable r = () -> {
-                functions.poke(api.getClients(), pokeText.getText());
+                this.functions.poke(this.api.getClients(), pokeText.getText());
                 pokeText.setText(pokeDisplayText.toString());
             };
 
@@ -164,7 +167,7 @@ public class TSControl extends JFrame {
                 return;
 
             Runnable r = () -> {
-                functions.poke(api.getClientByNameExact(client, true), pokeText.getText());
+                this.functions.poke(this.api.getClientByNameExact(client, true), pokeText.getText());
                 pokeText.setText(pokeDisplayText.toString());
             };
 
@@ -180,7 +183,7 @@ public class TSControl extends JFrame {
         pane.setBounds(10, 120, 300, 150);
         getContentPane().add(pane);
 
-        api.getClients().forEach((client) -> {
+        this.api.getClients().forEach((client) -> {
             if (!client.getNickname().equalsIgnoreCase(botNickname)) {
                 model.addElement(client.getNickname());
             }
@@ -193,10 +196,10 @@ public class TSControl extends JFrame {
             Runnable run = () -> {
                 List<Client> selectedClients = new ArrayList<>();
                 for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(api.getClientByNameExact(model.get(index).toString(), true));
+                    selectedClients.add(this.api.getClientByNameExact(model.get(index).toString(), true));
                 }
 
-                functions.permissions(selectedClients);
+                this.functions.permissions(selectedClients);
             };
 
             new Thread(run).start();
@@ -217,10 +220,10 @@ public class TSControl extends JFrame {
             Runnable run = () -> {
                 List<Client> selectedClients = new ArrayList<>();
                 for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(api.getClientByNameExact(model.get(index).toString(), true));
+                    selectedClients.add(this.api.getClientByNameExact(model.get(index).toString(), true));
                 }
 
-                functions.ban(selectedClients, seconds);
+                this.functions.ban(selectedClients, seconds);
             };
 
             new Thread(run).start();
@@ -233,16 +236,40 @@ public class TSControl extends JFrame {
         JButton refresh = new JButton("Refresh Clients");
         refresh.setBounds(320, 240, 150, 30);
         getContentPane().add(refresh);
-        refresh.addActionListener(a -> functions.refreshClients(onlineClients, api.getClients(), botNickname));
+        refresh.addActionListener(a -> this.functions.refreshClients(onlineClients, this.api.getClients(), botNickname));
+
+        try {
+            createNeededDirectories();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         JButton inputIntelligence = new JButton("Input Intelligence");
-        inputIntelligence.setBounds(10, 280, 150, 30);
+        inputIntelligence.setBounds(10, 280, 145, 30);
         getContentPane().add(inputIntelligence);
         inputIntelligence.addActionListener((a) -> {
             InputProcessing input = new InputProcessing();
-            input.load();
             input.setVisible(true);
             input.setLocationRelativeTo(null);
         });
+
+        JButton developerConsole = new JButton("Developer Console");
+        developerConsole.setBounds(165, 280, 145, 30);
+        getContentPane().add(developerConsole);
+        developerConsole.addActionListener((a) -> {
+            DeveloperConsole input = new DeveloperConsole();
+            input.setVisible(true);
+            input.setLocationRelativeTo(null);
+        });
+    }
+
+
+    private void createNeededDirectories() throws IOException {
+        final Path INPUT_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
+                "/appdata/roaming/TSBot/InputIntelligence.dat");
+
+        if (new File(INPUT_INTELLIGENCE_LOCATION.toString()).getParentFile().mkdirs()) {
+            new File(INPUT_INTELLIGENCE_LOCATION.toString()).createNewFile();
+        }
     }
 }

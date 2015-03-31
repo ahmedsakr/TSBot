@@ -16,6 +16,8 @@ import com.github.theholywaffle.teamspeak3.api.event.ServerEditedEvent;
 import com.github.theholywaffle.teamspeak3.api.event.TS3Listener;
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
 
+import java.io.IOException;
+
 
 /**
  *
@@ -29,7 +31,7 @@ public class CommandListener implements TS3Listener {
 
     public CommandListener(TS3Api api, String botNickname) {
         this.botNickname = botNickname;
-        commands = new Commands(api);
+        commands = new Commands(api, botNickname);
     }
 
 
@@ -39,7 +41,11 @@ public class CommandListener implements TS3Listener {
             return;
 
         if (e.getTargetMode() == TextMessageTargetMode.SERVER) {
-            commands.handleTextMessage(e.getInvokerName(), e.getMessage());
+            try {
+                commands.handleTextMessage(e.getInvokerName(), e.getMessage());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
