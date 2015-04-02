@@ -3,11 +3,8 @@ package com.tsbot;
 
 import com.tsbot.gui.TSBotLogin;
 
-import com.tsbot.io.InputIntelligenceReader;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import java.io.IOException;
 
 
 /**

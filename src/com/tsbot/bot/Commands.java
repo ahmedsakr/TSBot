@@ -22,13 +22,16 @@ public class Commands {
     }
 
     public void handleTextMessage(String username, String message) throws IOException {
-        new InputIntelligenceReader().processes().stream().filter(process ->
-                message.replaceAll(botName, "##botname##").equalsIgnoreCase(process.getInputText()) ||
-                (message.replaceAll(botName, "##botname##").contains(process.getInputText()) && process.containsOnly()))
-                .forEach(process ->
+        try (InputIntelligenceReader reader = new InputIntelligenceReader()) {
+            reader.processes().stream().filter(process ->
+                    message.replaceAll(botName, "##botname##").equalsIgnoreCase(process.getInputText()) ||
+                            (message.replaceAll(botName, "##botname##").contains(process.getInputText()) &&
+                                    process.containsOnly()))
+                    .forEach(process ->
 
-            this.api.sendServerMessage(process.getOutputText().
-                    replaceAll("##botname##", botName).replaceAll("##name##", username)));
+                            this.api.sendServerMessage(process.getOutputText().
+                                    replaceAll("##botname##", botName).replaceAll("##name##", username)));
+        }
     }
 
 

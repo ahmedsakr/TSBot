@@ -17,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,13 +47,17 @@ public class InputProcessing extends JFrame {
         model.addColumn("Input exact as Input Text");
         model.addColumn("Output Text");
 
-        try {
-            List<InputProcess> processes = new InputIntelligenceReader().processes();
+        try (InputIntelligenceReader reader = new InputIntelligenceReader()){
+            List<InputProcess> processes = reader.processes();
             processes.forEach((process) ->
                     model.addRow(new Object[]{
                             process.getInputText(), process.containsOnly(), process.getOutputText()}));
         } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                InputIntelligenceWriter.create();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
 
         JScrollPane scrollPane = new JScrollPane(rules);
@@ -71,6 +76,54 @@ public class InputProcessing extends JFrame {
             rule.setVisible(true);
             rule.setLocationRelativeTo(null);
         });
+
+        remove.addActionListener((a) -> {
+            ArrayList<Integer> indices = new ArrayList<>();
+            for (int k : rules.getSelectedRows())
+                indices.add(k);
+
+            try {
+                removeElements(model, indices);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+
+    private void removeElements(DefaultTableModel model, ArrayList<Integer> indices) throws IOException {
+
+        if (model.getRowCount() == 0) {
+            InputIntelligenceWriter.delete();
+            InputIntelligenceReader.invalidate();
+            return;
+        }
+
+        if (indices.size() == 0) {
+            InputIntelligenceWriter.delete();
+            try (InputIntelligenceWriter writer = new InputIntelligenceWriter()) {
+                InputIntelligenceReader.invalidate();
+
+                Object[] details = new Object[3];
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    for (int j = 0; j < model.getColumnCount(); j++) {
+                        details[j] = model.getValueAt(i, j);
+                    }
+
+                    writer.update(String.valueOf(details[0]), Boolean.valueOf(details[1].toString()),
+                            String.valueOf(details[2]));
+                }
+                return;
+            }
+        }
+
+        model.removeRow(indices.remove(0));
+
+        for (int i = 0; i < indices.size(); i++) {
+            indices.set(i, indices.get(i) - 1);
+        }
+
+        removeElements(model, indices);
     }
 }
 
@@ -111,7 +164,7 @@ class RuleAddition extends JFrame {
         JCheckBox contains = new JCheckBox("<html>User's input should only " + color("contain", "ff0000") +
                 " the specified input text in order for it to execute," +
                 " and not explicitly " + color("exact", "ff0000") + " as the input.</html>");
-        contains.setBounds(20,140, 350, 50);
+        contains.setBounds(20, 140, 350, 50);
 
         form.add(inputText);
         form.add(outputText);
@@ -129,16 +182,17 @@ class RuleAddition extends JFrame {
 
         update.addActionListener((a) -> {
             try (InputIntelligenceWriter writer = new InputIntelligenceWriter()){
-                writer.update(inputText.getText(), outputText.getText(), contains.isSelected());
+                InputIntelligenceReader.invalidate();
+                writer.update(inputText.getText(), contains.isSelected(), outputText.getText());
                 DefaultTableModel model = (DefaultTableModel) rules.getModel();
                 model.addRow(new Object[]{inputText.getText(), contains.isSelected(), outputText.getText()});
                 dispose();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         });
+
+        cancel.addActionListener((a) -> dispose());
     }
 
     private String color(String text, String hex) {
