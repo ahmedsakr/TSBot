@@ -1,9 +1,9 @@
 package com.tsbot.gui;
 
 
-import com.tsbot.bot.InputProcess;
-import com.tsbot.io.InputIntelligenceReader;
-import com.tsbot.io.InputIntelligenceWriter;
+import com.tsbot.bot.Intellect;
+import com.tsbot.io.IntelligenceReader;
+import com.tsbot.io.IntelligenceWriter;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -47,14 +47,14 @@ public class InputProcessing extends JFrame {
         model.addColumn("Input exact as Input Text");
         model.addColumn("Output Text");
 
-        try (InputIntelligenceReader reader = new InputIntelligenceReader()){
-            List<InputProcess> processes = reader.processes();
+        try (IntelligenceReader reader = new IntelligenceReader()){
+            List<Intellect> processes = reader.intelligence();
             processes.forEach((process) ->
                     model.addRow(new Object[]{
                             process.getInputText(), process.containsOnly(), process.getOutputText()}));
         } catch (IOException e) {
             try {
-                InputIntelligenceWriter.create();
+                IntelligenceWriter.create();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -65,7 +65,7 @@ public class InputProcessing extends JFrame {
 
         JPanel buttons = new JPanel();
         JButton process = new JButton("Amend Intelligence");
-        JButton remove = new JButton("Remove selected processes");
+        JButton remove = new JButton("Remove selected rows");
         buttons.add(process);
         buttons.add(remove);
 
@@ -94,15 +94,15 @@ public class InputProcessing extends JFrame {
     private void removeElements(DefaultTableModel model, ArrayList<Integer> indices) throws IOException {
 
         if (model.getRowCount() == 0) {
-            InputIntelligenceWriter.delete();
-            InputIntelligenceReader.invalidate();
+            IntelligenceWriter.delete();
+            IntelligenceReader.invalidate();
             return;
         }
 
         if (indices.size() == 0) {
-            InputIntelligenceWriter.delete();
-            try (InputIntelligenceWriter writer = new InputIntelligenceWriter()) {
-                InputIntelligenceReader.invalidate();
+            IntelligenceWriter.delete();
+            try (IntelligenceWriter writer = new IntelligenceWriter()) {
+                IntelligenceReader.invalidate();
 
                 Object[] details = new Object[3];
                 for (int i = 0; i < model.getRowCount(); i++) {
@@ -181,8 +181,8 @@ class RuleAddition extends JFrame {
         getContentPane().add(actions, BorderLayout.SOUTH);
 
         update.addActionListener((a) -> {
-            try (InputIntelligenceWriter writer = new InputIntelligenceWriter()){
-                InputIntelligenceReader.invalidate();
+            try (IntelligenceWriter writer = new IntelligenceWriter()){
+                IntelligenceReader.invalidate();
                 writer.update(inputText.getText(), contains.isSelected(), outputText.getText());
                 DefaultTableModel model = (DefaultTableModel) rules.getModel();
                 model.addRow(new Object[]{inputText.getText(), contains.isSelected(), outputText.getText()});

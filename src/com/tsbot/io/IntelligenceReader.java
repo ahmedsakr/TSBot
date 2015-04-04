@@ -1,7 +1,7 @@
 package com.tsbot.io;
 
 
-import com.tsbot.bot.InputProcess;
+import com.tsbot.bot.Intellect;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,10 +14,14 @@ import java.util.ArrayList;
  *
  * @author Ahmad Sakr
  * @since March 31, 2015.
+ *
+ *
+ * Consists the Reading job of the I/O for the input intelligence. Solely brought to life to read the intelligence file
+ * and sort the data into objects that can be easily used to manipulate input from users on the teamspeak server.
  */
-public class InputIntelligenceReader extends BufferedReader {
+public class IntelligenceReader extends BufferedReader {
 
-    private ArrayList<InputProcess> processes;
+    private ArrayList<Intellect> intelligence;
     private static boolean updated;
 
     public static final Path INPUT_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
@@ -28,54 +32,54 @@ public class InputIntelligenceReader extends BufferedReader {
      *
      * @throws IOException
      */
-    public InputIntelligenceReader() throws IOException {
+    public IntelligenceReader() throws IOException {
         super(new FileReader(INPUT_INTELLIGENCE_LOCATION.toString()));
     }
 
     /**
-     * Connects to the file ({@link InputIntelligenceReader#INPUT_INTELLIGENCE_LOCATION}. Converts all binary input
-     * to decimal, and then finally to String. Through the use of toInputProcess(String) function, an InputProcess
-     * object is appended to the {@link InputIntelligenceReader#processes}.
+     * Connects to the file ({@link IntelligenceReader#INPUT_INTELLIGENCE_LOCATION}. Converts all binary input
+     * to decimal, and then finally to String. Through the use of toIntellect(String) function, an Intellect
+     * object is appended to the {@link IntelligenceReader#intelligence}.
      * <p>
      * Constant reading from the file is redundant, as it can lead to the same data if no other processes have been
      * deleted or added. In order to prevent this, a check is deployed to check whether the data in processes
-     * is up-to-date or not. If it is update, then return {@link InputIntelligenceReader#processes} without
+     * is up-to-date or not. If it is update, then return {@link IntelligenceReader#intelligence} without
      * further inspection.
      *
-     * @return {@link InputIntelligenceReader#processes}.
+     * @return {@link IntelligenceReader#intelligence}.
      * @throws IOException
      *
-     * @see InputProcess
-     * @see InputIntelligenceReader#toInputProcess(String)
-     * @see InputIntelligenceReader#invalidate()
-     * @see InputIntelligenceReader#isUpdated()
+     * @see Intellect
+     * @see IntelligenceReader#toIntellect(String)
+     * @see IntelligenceReader#invalidate()
+     * @see IntelligenceReader#isUpdated()
      */
-    public ArrayList<InputProcess> processes() throws IOException {
-        if (this.processes == null || !isUpdated()) {
-            processes = new ArrayList<>();
-
+    public ArrayList<Intellect> intelligence() throws IOException {
+        if (this.intelligence == null || !isUpdated()) {
+            intelligence = new ArrayList<>();
             String currentLine;
-            StringBuilder process = new StringBuilder();
+            StringBuilder intellect = new StringBuilder();
+
             while ((currentLine = readLine()) != null) {
                 String[] parts = currentLine.split(" ");
                 for (String part : parts) {
                     int decimal = Integer.valueOf(toDecimal(part));
-                    process.append(Character.toString((char) decimal));
+                    intellect.append(Character.toString((char) decimal));
                 }
 
-                processes.add(toInputProcess(process.toString()));
-                process = new StringBuilder();
+                intelligence.add(toIntellect(intellect.toString()));
+                intellect = new StringBuilder();
             }
         } else {
-            return this.processes;
+            return this.intelligence;
         }
 
         updated = true;
-        return this.processes;
+        return this.intelligence;
     }
 
     /**
-     * Invalidates the data held in {@link InputIntelligenceReader#processes} and sets it to outdated.
+     * Invalidates the data held in {@link IntelligenceReader#intelligence} and sets it to outdated.
      * Static usage is needed and optimal in this function for completely control over all objects of this class
      * and ease of invalidation without the need to construct the class.
      */
@@ -94,19 +98,19 @@ public class InputIntelligenceReader extends BufferedReader {
     }
 
     /**
-     * Converts the String object process to an object of type {@link InputProcess}.
+     * Converts the String object process to an object of type {@link Intellect}.
      *
-     * @param process the data to be used for construction of the object of type {@link InputProcess}.
+     * @param process the data to be used for construction of the object of type {@link Intellect}.
      *
-     * @return an {@link InputProcess} Object
+     * @return an {@link Intellect} Object
      */
-    private InputProcess toInputProcess(String process) {
+    private Intellect toIntellect(String process) {
         String[] details = process.split("__", 3);
         String[] input = details[0].split(":");
         String[] contains = details[1].split(":");
         String[] output = details[2].split(":");
 
-        return new InputProcess(input[1], Boolean.valueOf(contains[1]), output[1]);
+        return new Intellect(input[1], Boolean.valueOf(contains[1]), output[1]);
     }
 
     /**

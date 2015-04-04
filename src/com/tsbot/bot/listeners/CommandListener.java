@@ -1,4 +1,4 @@
-package com.tsbot.bot;
+package com.tsbot.bot.listeners;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
@@ -15,6 +15,7 @@ import com.github.theholywaffle.teamspeak3.api.event.ClientMovedEvent;
 import com.github.theholywaffle.teamspeak3.api.event.ServerEditedEvent;
 import com.github.theholywaffle.teamspeak3.api.event.TS3Listener;
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
+import com.tsbot.bot.Commands;
 
 import java.io.IOException;
 

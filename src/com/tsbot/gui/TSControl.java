@@ -3,7 +3,7 @@ package com.tsbot.gui;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import com.tsbot.bot.CommandListener;
+import com.tsbot.bot.listeners.CommandListener;
 import com.tsbot.bot.Functions;
 
 import java.awt.Color;

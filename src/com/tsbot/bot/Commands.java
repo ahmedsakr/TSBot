@@ -2,7 +2,7 @@ package com.tsbot.bot;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.tsbot.io.InputIntelligenceReader;
+import com.tsbot.io.IntelligenceReader;
 
 import java.io.IOException;
 
@@ -22,13 +22,13 @@ public class Commands {
     }
 
     public void handleTextMessage(String username, String message) throws IOException {
-        try (InputIntelligenceReader reader = new InputIntelligenceReader()) {
-            reader.processes().stream().filter(process ->
+        try (IntelligenceReader reader = new IntelligenceReader()) {
+            reader.intelligence().stream()
+                    .filter(process ->
                     message.replaceAll(botName, "##botname##").equalsIgnoreCase(process.getInputText()) ||
                             (message.replaceAll(botName, "##botname##").contains(process.getInputText()) &&
                                     process.containsOnly()))
                     .forEach(process ->
-
                             this.api.sendServerMessage(process.getOutputText().
                                     replaceAll("##botname##", botName).replaceAll("##name##", username)));
         }
