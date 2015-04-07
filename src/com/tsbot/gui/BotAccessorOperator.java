@@ -7,7 +7,10 @@ import com.tsbot.credentials.Credential;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.logging.Level;
+
+import com.tsbot.io.IntelligenceReader;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -100,6 +103,8 @@ public class BotAccessorOperator extends JFrame {
             progress.setString("Success! Loading...");
             api.setNickname(botNickname.toString());
 
+            prepareEnvironment();
+
             DeveloperConsole console = new DeveloperConsole();
             console.setVisible(true);
             console.setLocation(0, 0);
@@ -119,5 +124,13 @@ public class BotAccessorOperator extends JFrame {
 
     private boolean isConnected(TS3Api api) {
         return api != null && api.getClients() != null;
+    }
+
+    private void prepareEnvironment() {
+        try {
+            IntelligenceReader.createNeededDirectory();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

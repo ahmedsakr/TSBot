@@ -4,20 +4,21 @@ package com.tsbot.io;
 import com.tsbot.bot.Intellect;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
+ * Consists the Reading job of the I/O for the input intelligence. Solely brought to life to read the intelligence file
+ * and sort the data into objects that can be easily used to manipulate input from users on the teamspeak server.
+ *
  *
  * @author Ahmad Sakr
  * @since March 31, 2015.
- *
- *
- * Consists the Reading job of the I/O for the input intelligence. Solely brought to life to read the intelligence file
- * and sort the data into objects that can be easily used to manipulate input from users on the teamspeak server.
  */
 public class IntelligenceReader extends BufferedReader {
 
@@ -121,6 +122,14 @@ public class IntelligenceReader extends BufferedReader {
      */
     private String toDecimal(String binary) {
         return Integer.parseInt(binary, 2) + "";
+    }
+
+
+    public static Path createNeededDirectory() throws IOException {
+        if (Files.isDirectory(INPUT_INTELLIGENCE_LOCATION.getParent()))
+            return null;
+
+        return Files.createDirectory(INPUT_INTELLIGENCE_LOCATION.getParent());
     }
 
 }

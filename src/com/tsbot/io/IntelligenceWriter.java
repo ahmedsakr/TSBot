@@ -11,14 +11,12 @@ import java.nio.file.Paths;
 
 
 /**
- *
- * @author ahmad sakr
- * @since March 31, 2015.
- *
- *
  * Consists the Writing part of the I/O package for input intelligence. Solely brought to life in the means of
  * updating the intelligence file. All Data written is strictly in binary.
  *
+ *
+ * @author ahmad sakr
+ * @since March 31, 2015.
  */
 public class IntelligenceWriter extends BufferedWriter {
 
@@ -40,7 +38,7 @@ public class IntelligenceWriter extends BufferedWriter {
 
     /**
      * Updates the file to hold a new record of a process. All data is converted to binary before it is written
-     * to the file.
+     * to the file. All data held by objects of {@link IntelligenceReader} are invalidated.
      *
      * @param inputText the input text that the user will be required to input to trigger this process
      * @param contains the condition whether the inputText needs to be only in the original input or not.
@@ -49,6 +47,7 @@ public class IntelligenceWriter extends BufferedWriter {
      * @throws IOException
      *
      * @see IntelligenceWriter#toBinary(String)
+     * @see IntelligenceReader#invalidate()
      */
     public void update(String inputText, boolean contains, String outputText) throws IOException {
         String binaryInput = toBinary("Input Text:" + inputText + "__");
@@ -57,30 +56,39 @@ public class IntelligenceWriter extends BufferedWriter {
 
         write(binaryInput + binaryOutput + binaryContains);
         newLine();
+
+        IntelligenceReader.invalidate();
     }
 
 
     /**
-     * If the file exists, then it will be deleted.
+     * If the file exists, then it will be deleted. The data held by all objects of {@link IntelligenceReader} is
+     * invalidated automatically upon call of this method.
      * Static usage is crucially needed in this function. Constructing the object and calling this method object-wise
      * will throw a {@link java.nio.file.FileSystemException} as it will be in use by the writer.
      *
      * @return if the file has been deleted or not.
      * @throws IOException
+     *
+     * @see IntelligenceReader#invalidate()
      */
     public static boolean delete() throws IOException {
+        IntelligenceReader.invalidate();
         return Files.deleteIfExists(INPUT_INTELLIGENCE_LOCATION);
     }
 
     /**
-     * Creates the file in the path {@link IntelligenceWriter#INPUT_INTELLIGENCE_LOCATION}.
+     * Creates the file in the path {@link IntelligenceWriter#INPUT_INTELLIGENCE_LOCATION} if it does not exist.
      * Static usage is crucially needed in this function. Constructing the object and calling this method object-wise
      * will throw a {@link java.nio.file.FileSystemException} as it will be in use by the writer.
      *
-     * @return The {@link Path} to the file that has been created.
+     * @return The {@link Path} to a file if it has been created. Otherwise, null is returned. (file already exists)
      * @throws IOException
      */
     public static Path create() throws IOException {
+        if (Files.exists(INPUT_INTELLIGENCE_LOCATION))
+            return null;
+
         return Files.createFile(INPUT_INTELLIGENCE_LOCATION);
     }
 

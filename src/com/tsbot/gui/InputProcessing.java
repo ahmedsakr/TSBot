@@ -2,6 +2,7 @@ package com.tsbot.gui;
 
 
 import com.tsbot.bot.Intellect;
+import com.tsbot.gui.effects.GhostText;
 import com.tsbot.io.IntelligenceReader;
 import com.tsbot.io.IntelligenceWriter;
 import javax.swing.JButton;
@@ -29,6 +30,11 @@ public class InputProcessing extends JFrame {
 
     public JTable rules;
 
+    /**
+     * Default Constructor.
+     *
+     * Constructs the Input Frame and adds all the components to it.
+     */
     public InputProcessing() {
         super("TSBot - Input Intelligence");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -48,10 +54,10 @@ public class InputProcessing extends JFrame {
         model.addColumn("Output Text");
 
         try (IntelligenceReader reader = new IntelligenceReader()){
-            List<Intellect> processes = reader.intelligence();
-            processes.forEach((process) ->
+            List<Intellect> intelligence = reader.intelligence();
+            intelligence.forEach((intellect) ->
                     model.addRow(new Object[]{
-                            process.getInputText(), process.containsOnly(), process.getOutputText()}));
+                            intellect.getInputText(), intellect.containsOnly(), intellect.getOutputText()}));
         } catch (IOException e) {
             try {
                 IntelligenceWriter.create();
@@ -91,20 +97,31 @@ public class InputProcessing extends JFrame {
     }
 
 
+    /**
+     * Removes the selected indices from the table and updates the master file.
+     *
+     * @param model the model of the intelligence table
+     * @param indices the selected indices to be removed
+     *
+     * @throws IOException
+     */
     private void removeElements(DefaultTableModel model, ArrayList<Integer> indices) throws IOException {
 
+        // if all the rows have been deleted the master file will be deleted as it will be redundant. (empty)
         if (model.getRowCount() == 0) {
             IntelligenceWriter.delete();
-            IntelligenceReader.invalidate();
             return;
         }
 
+        /**
+         *  breaking point of the recursion calls. Once all the selected indices have been deleted,
+         *  the file will be deleted completely and reconstructed with the remaining data.
+         */
         if (indices.size() == 0) {
             IntelligenceWriter.delete();
             try (IntelligenceWriter writer = new IntelligenceWriter()) {
-                IntelligenceReader.invalidate();
 
-                Object[] details = new Object[3];
+                Object[] details = new Object[model.getColumnCount()];
                 for (int i = 0; i < model.getRowCount(); i++) {
                     for (int j = 0; j < model.getColumnCount(); j++) {
                         details[j] = model.getValueAt(i, j);
@@ -119,6 +136,10 @@ public class InputProcessing extends JFrame {
 
         model.removeRow(indices.remove(0));
 
+        /**
+         *  All indices have to be decremented by one as the amount of rows has decremented by one.
+         *  Failure in doing this step will cause an {@link ArrayIndexOutOfBoundsException}.
+         **/
         for (int i = 0; i < indices.size(); i++) {
             indices.set(i, indices.get(i) - 1);
         }
@@ -182,7 +203,6 @@ class RuleAddition extends JFrame {
 
         update.addActionListener((a) -> {
             try (IntelligenceWriter writer = new IntelligenceWriter()){
-                IntelligenceReader.invalidate();
                 writer.update(inputText.getText(), contains.isSelected(), outputText.getText());
                 DefaultTableModel model = (DefaultTableModel) rules.getModel();
                 model.addRow(new Object[]{inputText.getText(), contains.isSelected(), outputText.getText()});

@@ -18,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tsbot.gui.effects.GhostText;
+import com.tsbot.io.IntelligenceReader;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -110,6 +112,7 @@ public class TSControl extends JFrame {
      * Loads all the components onto the frame.
      */
     private void components() {
+
         JTextField chatArea = new JTextField(15);
         chatArea.setBounds(10, 10, 300, 40);
         GhostText chatDisplayText = new GhostText("Send A Message...", chatArea);
@@ -238,12 +241,6 @@ public class TSControl extends JFrame {
         getContentPane().add(refresh);
         refresh.addActionListener(a -> this.functions.refreshClients(onlineClients, this.api.getClients(), botNickname));
 
-        try {
-            createNeededDirectories();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         JButton inputIntelligence = new JButton("Input Intelligence");
         inputIntelligence.setBounds(10, 280, 145, 30);
         getContentPane().add(inputIntelligence);
@@ -261,15 +258,5 @@ public class TSControl extends JFrame {
             input.setVisible(true);
             input.setLocationRelativeTo(null);
         });
-    }
-
-
-    private void createNeededDirectories() throws IOException {
-        final Path INPUT_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
-                "/appdata/roaming/TSBot/InputIntelligence.dat");
-
-        if (new File(INPUT_INTELLIGENCE_LOCATION.toString()).getParentFile().mkdirs()) {
-            new File(INPUT_INTELLIGENCE_LOCATION.toString()).createNewFile();
-        }
     }
 }
