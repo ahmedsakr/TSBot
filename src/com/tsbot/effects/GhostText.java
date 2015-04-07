@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Ahmad Sakr
+ * Copyright (c) 2015 Ahmed Sakr
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public class GhostText implements FocusListener, KeyListener {
 
 
     /**
-     * if the text is empty, the ghost text and the foreground are restored. Please note:
+     * Ff the text is empty, the ghost text and the foreground are restored. Please note:
      * the return in the first if statement is crucial, because if the method does not return,
      * it will also go to the other if statement and pass the condition as it's already empty.
      *
@@ -135,7 +135,12 @@ public class GhostText implements FocusListener, KeyListener {
     }
 
 
-
+    /**
+     * Overrides the abstract {@link Object} method toString().
+     *
+     * @return The ghostText.
+     */
+    @Override
     public String toString() {
         return text;
     }

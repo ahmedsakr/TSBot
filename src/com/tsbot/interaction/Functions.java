@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2015 Ahmed Sakr
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.tsbot.interaction;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
@@ -68,13 +84,13 @@ public class Functions {
 
         JFrame frame = new JFrame("Permissions - " + currentClient.getNickname());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(500,100);
-        frame.setResizable(false);
+        frame.setSize(500, 100);
 
         JPanel panel = new JPanel();
 
+        // Parallel lists. Every checkbox (permissions) has a corresponding ServerGroup Id (permissionsIds)
         List<JCheckBox> permissions = new ArrayList<>();
-        List<Integer> permissionsId = new ArrayList<>();
+        List<Integer> permissionIds = new ArrayList<>();
 
         for (ServerGroup group : groups) {
             // TeamSpeak default server group ids not for users.
@@ -91,7 +107,7 @@ public class Functions {
             }
 
             permissions.add(checkBox);
-            permissionsId.add(group.getId());
+            permissionIds.add(group.getId());
             panel.add(checkBox);
         }
 
@@ -117,39 +133,91 @@ public class Functions {
 
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
-        boolean isSamePermissions = sameAction != null;
+
+        final JCheckBox finalSameAction = sameAction;
         next.addActionListener((a) -> {
+
+            boolean isSamePermissions = finalSameAction != null && finalSameAction.isSelected();
             Runnable run = () -> {
+
+                // if the operator has indicated to assign the selected ranks to all the upcoming clients.
                 if (isSamePermissions) {
-                    for (Client client : clients) {
-                        for (int i = 0; i < permissions.size(); i++) {
-                            if (permissions.get(i).isSelected()) {
-                                api.addClientToServerGroup(permissionsId.get(i), client.getDatabaseId());
-                            } else {
-                                api.removeClientFromServerGroup(permissionsId.get(i), client.getDatabaseId());
-                            }
-                        }
-                    }
+
+                    clients.forEach((client) -> changePermissions(permissions, permissionIds, client));
 
                     clients.clear();
                     frame.dispose();
                 } else {
-                    for (int i = 0; i < permissions.size(); i++) {
-                        if (permissions.get(i).isSelected()) {
-                            api.addClientToServerGroup(permissionsId.get(i), clients.get(0).getDatabaseId());
-                        } else {
-                            api.removeClientFromServerGroup(permissionsId.get(i), clients.get(0).getDatabaseId());
-                        }
-                    }
+
+                    changePermissions(permissions, permissionIds, currentClient);
 
                     clients.remove(0);
                     frame.dispose();
                     permissions(clients, groups);
                 }
+
             };
 
             new Thread(run).start();
         });
+    }
+
+
+    /**
+     * According to the data from boxes and permissionIds, the client's permissions will be changed accordingly.
+     * If a certain ServerGroup is selected, then the client will be added to that ServerGroup if they are not
+     * part of it already. If they are part of it, the iteration will be ignored as attempting to add a client
+     * to a ServerGroup that they already partake in returns an error.
+     *
+     * If a certain ServerGroup is deselected, then the client will be removed from that ServerGroup if they are part
+     * of it. If they are not part of it, the iteration will be ignored as attempting to remove a client from a
+     * ServerGroup that they do not partake in returns an error.
+     *
+     * @param boxes A list of {@link JCheckBox}s that represent the ServerGroups
+     * @param permissionIds The corresponding list of ServerGroup Identification numbers.
+     * @param client The client to take action upon.
+     */
+    private void changePermissions(List<JCheckBox> boxes, List<Integer> permissionIds, Client client) {
+        for (int i = 0; i < boxes.size(); i++) {
+            if (boxes.get(i).isSelected()) {
+                int groupId = permissionIds.get(i);
+
+                // if the user is already in that server group, then jump to the next iteration.
+                if (inServerGroup(client, groupId)) {
+                    continue;
+                }
+
+                api.addClientToServerGroup(groupId, client.getDatabaseId());
+            } else {
+                int groupId = permissionIds.get(i);
+
+                // if the user is already not in that server group, then jump to the next iteration.
+                if (!inServerGroup(client, groupId)) {
+                    continue;
+                }
+
+                api.removeClientFromServerGroup(groupId, client.getDatabaseId());
+            }
+        }
+    }
+
+
+    /**
+     * Performs a sequential search on the client's assigned ServerGroups in a quest to find if it contains groupId.
+     *
+     * @param client The client in question.
+     * @param groupId the groupId the search is attempting to locate.
+     * @return {@code true} If the groupId is found in the client's assigned ServerGroups
+     *         {@code false} if the groupId is not found.
+     */
+    private boolean inServerGroup(Client client, int groupId) {
+        for (int id : client.getServerGroups()) {
+            if (groupId == id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

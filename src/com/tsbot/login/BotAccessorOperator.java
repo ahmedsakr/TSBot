@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2015 Ahmed Sakr
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.tsbot.login;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
@@ -106,7 +122,11 @@ public class BotAccessorOperator extends JFrame {
             progress.setString("Success! Loading...");
             api.setNickname(botNickname.toString());
 
-            prepareEnvironment();
+            try {
+                prepareEnvironment();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             DeveloperConsole console = new DeveloperConsole();
             console.setVisible(true);
@@ -125,15 +145,24 @@ public class BotAccessorOperator extends JFrame {
     }
 
 
+    /**
+     * Validates whether to the connection to the server has been successful.
+     *
+     * @param api the api used to handshake the server.
+     *
+     * @return the connection status of the api.
+     *         {@code true} if the api is successfully hooked and on-line.
+     *         {@code false} if the api failed to connect for whatever reason.
+     */
     private boolean isConnected(TS3Api api) {
         return api != null && api.getClients() != null;
     }
 
-    private void prepareEnvironment() {
-        try {
-            IntelligenceReader.createNeededDirectory();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    /**
+     * Prepares the parent folder in order to start writing files into it.
+     */
+    private void prepareEnvironment() throws IOException {
+        IntelligenceReader.createNeededDirectory();
     }
 }
