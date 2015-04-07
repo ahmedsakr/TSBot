@@ -1,8 +1,8 @@
-package com.tsbot.gui;
+package com.tsbot.login;
 
 
-import com.tsbot.credentials.Credential;
-import com.tsbot.gui.effects.GhostText;
+import com.tsbot.login.security.Credential;
+import com.tsbot.effects.GhostText;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -28,7 +28,7 @@ public class TSBotLogin extends JFrame {
 
 
     /**
-     * Constructor for {@link com.tsbot.gui.TSBotLogin}.
+     * Constructor for {@link TSBotLogin}.
      * Builds the JFrame in question with the provided title.
      */
     public TSBotLogin() {

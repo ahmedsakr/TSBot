@@ -1,4 +1,4 @@
-package com.tsbot.bot;
+package com.tsbot.interaction;
 
 
 /**

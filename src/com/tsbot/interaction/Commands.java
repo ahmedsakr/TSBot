@@ -1,4 +1,4 @@
-package com.tsbot.bot;
+package com.tsbot.interaction;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;

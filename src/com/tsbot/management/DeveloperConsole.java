@@ -1,4 +1,4 @@
-package com.tsbot.gui;
+package com.tsbot.management;
 
 
 import java.awt.BorderLayout;

@@ -1,7 +1,7 @@
 package com.tsbot;
 
 
-import com.tsbot.gui.TSBotLogin;
+import com.tsbot.login.TSBotLogin;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;

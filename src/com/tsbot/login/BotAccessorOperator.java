@@ -1,15 +1,18 @@
-package com.tsbot.gui;
+package com.tsbot.login;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
-import com.tsbot.credentials.Credential;
+import com.tsbot.login.security.Credential;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import com.tsbot.management.DeveloperConsole;
+import com.tsbot.management.InputProcessing;
+import com.tsbot.management.TSControl;
 import com.tsbot.io.IntelligenceReader;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -30,7 +33,7 @@ public class BotAccessorOperator extends JFrame {
 
     /**
      *
-     * Constructor for {@link com.tsbot.gui.BotAccessorOperator}.
+     * Constructor for {@link BotAccessorOperator}.
      * The reason behind requiring an object of TSBotLogin is to simply redirect the user back to the original
      * login frame if the login failed for any reason. (incorrect password or invalid username)
      * Builds the frame for logging in the user.

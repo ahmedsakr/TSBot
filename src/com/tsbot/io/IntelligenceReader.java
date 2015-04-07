@@ -1,10 +1,9 @@
 package com.tsbot.io;
 
 
-import com.tsbot.bot.Intellect;
+import com.tsbot.interaction.Intellect;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;

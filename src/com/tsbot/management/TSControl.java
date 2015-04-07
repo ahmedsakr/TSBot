@@ -1,25 +1,20 @@
-package com.tsbot.gui;
+package com.tsbot.management;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import com.tsbot.bot.listeners.CommandListener;
-import com.tsbot.bot.Functions;
+import com.tsbot.interaction.listeners.CommandListener;
+import com.tsbot.interaction.Functions;
 
 import java.awt.Color;
 import java.awt.Dimension;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tsbot.gui.effects.GhostText;
-import com.tsbot.io.IntelligenceReader;
+import com.tsbot.effects.GhostText;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -42,7 +37,7 @@ public class TSControl extends JFrame {
 
 
     /**
-     * Constructor for {@link com.tsbot.gui.TSControl}.
+     * Constructor for {@link TSControl}.
      * After the user has been admitted access to the bot, the user is ready to start
      * utilizing all functions and features the bot has to offer. In result, build the frame
      * and display it to the user.

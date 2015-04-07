@@ -1,4 +1,4 @@
-package com.tsbot.bot;
+package com.tsbot.interaction;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
@@ -31,7 +31,7 @@ public class Functions {
 
 
     /**
-     * Constructor for {@link com.tsbot.bot.Functions}.
+     * Constructor for {@link Functions}.
      *
      * @param api the corresponding api associated with the server.
      */

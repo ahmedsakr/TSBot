@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tsbot.gui.effects;
+package com.tsbot.effects;
 
 import java.awt.Color;
 import java.awt.event.FocusEvent;

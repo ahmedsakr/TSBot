@@ -1,8 +1,8 @@
-package com.tsbot.gui;
+package com.tsbot.management;
 
 
-import com.tsbot.bot.Intellect;
-import com.tsbot.gui.effects.GhostText;
+import com.tsbot.interaction.Intellect;
+import com.tsbot.effects.GhostText;
 import com.tsbot.io.IntelligenceReader;
 import com.tsbot.io.IntelligenceWriter;
 import javax.swing.JButton;
