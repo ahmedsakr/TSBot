@@ -41,9 +41,9 @@ public class Commands {
         try (IntelligenceReader reader = new IntelligenceReader()) {
             reader.intelligence().stream()
                     .filter(process ->
-                    message.replaceAll(botName, "##botname##").equalsIgnoreCase(process.getInputText()) ||
-                            (message.replaceAll(botName, "##botname##").contains(process.getInputText()) &&
-                                    process.containsOnly()))
+                    message.replaceAll(botName, "##botname##").replaceAll(username, "##name###")
+                            .equalsIgnoreCase(process.getInputText()) || (message.replaceAll(botName, "##botname##")
+                            .contains(process.getInputText()) && process.containsOnly()))
                     .forEach(process ->
                             this.api.sendServerMessage(process.getOutputText().
                                     replaceAll("##botname##", botName).replaceAll("##name##", username)));

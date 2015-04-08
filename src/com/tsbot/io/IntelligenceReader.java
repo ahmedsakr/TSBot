@@ -122,13 +122,13 @@ public class IntelligenceReader extends BufferedReader {
      */
     private Intellect toIntellect(String process) {
         process = process.trim().replace("<", "").replace(">", "");
-        String[] details = process.split(" ", 3);
+        String[] details = process.split("\t", 3);
 
         String[] input = details[0].split("=");
         String[] contains = details[1].split("=");
         String[] output = details[2].split("=");
 
-        return new Intellect(input[1].replace("\"", ""), Boolean.valueOf(contains[1].replace("\"", "")),
+        return new Intellect(input[1].replace("\"", ""), !Boolean.valueOf(contains[1].replace("\"", "")),
                 output[1].replace("\"", ""));
     }
 
