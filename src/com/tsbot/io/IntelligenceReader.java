@@ -17,7 +17,7 @@
 package com.tsbot.io;
 
 
-import com.tsbot.interaction.Intellect;
+import com.tsbot.management.interaction.Intellect;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -114,19 +114,22 @@ public class IntelligenceReader extends BufferedReader {
     }
 
     /**
-     * Converts the String object process to an object of type {@link Intellect}.
+     * Converts the object process to an object of type {@link Intellect}.
      *
      * @param process the data to be used for construction of the object of type {@link Intellect}.
      *
      * @return an {@link Intellect} Object
      */
     private Intellect toIntellect(String process) {
-        String[] details = process.split("__", 3);
-        String[] input = details[0].split(":");
-        String[] contains = details[1].split(":");
-        String[] output = details[2].split(":");
+        process = process.trim().replace("<", "").replace(">", "");
+        String[] details = process.split(" ", 3);
 
-        return new Intellect(input[1], Boolean.valueOf(contains[1]), output[1]);
+        String[] input = details[0].split("=");
+        String[] contains = details[1].split("=");
+        String[] output = details[2].split("=");
+
+        return new Intellect(input[1].replace("\"", ""), Boolean.valueOf(contains[1].replace("\"", "")),
+                output[1].replace("\"", ""));
     }
 
     /**

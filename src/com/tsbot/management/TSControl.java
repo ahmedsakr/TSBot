@@ -19,8 +19,8 @@ package com.tsbot.management;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import com.tsbot.interaction.listeners.CommandListener;
-import com.tsbot.interaction.Functions;
+import com.tsbot.management.interaction.listeners.CommandListener;
+import com.tsbot.management.interaction.Functions;
 
 import java.awt.Color;
 import java.awt.Dimension;

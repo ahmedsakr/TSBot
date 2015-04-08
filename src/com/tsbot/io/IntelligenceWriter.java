@@ -66,14 +66,19 @@ public class IntelligenceWriter extends BufferedWriter {
      * @see IntelligenceReader#invalidate()
      */
     public void update(String inputText, boolean contains, String outputText) throws IOException {
-        String binaryInput = toBinary("Input Text:" + inputText + "__");
-        String binaryOutput = toBinary("Contains:" + contains + "__");
-        String binaryContains = toBinary("Output Text:" + outputText);
+        String binaryInput = toBinary("<input_text=\"" + inputText + "\" ");
+        String binaryOutput = toBinary("contains=\"" + contains + "\" ");
+        String binaryContains = toBinary("output_text=\"" + outputText + "\">");
 
         write(binaryInput + binaryOutput + binaryContains);
         newLine();
 
         IntelligenceReader.invalidate();
+    }
+
+
+    public void update(Object[] details) throws IOException {
+        update(details[0].toString(), Boolean.valueOf(details[1].toString()), details[2].toString());
     }
 
 

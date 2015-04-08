@@ -17,7 +17,7 @@
 package com.tsbot.management;
 
 
-import com.tsbot.interaction.Intellect;
+import com.tsbot.management.interaction.Intellect;
 import com.tsbot.effects.GhostText;
 import com.tsbot.io.IntelligenceReader;
 import com.tsbot.io.IntelligenceWriter;
@@ -29,6 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.BorderLayout;
@@ -66,7 +68,7 @@ public class InputProcessing extends JFrame {
         rules = new JTable(model);
 
         model.addColumn("Input Text");
-        model.addColumn("Input exact as Input Text");
+        model.addColumn("Strictly exact as user input");
         model.addColumn("Output Text");
 
         try (IntelligenceReader reader = new IntelligenceReader()){
@@ -108,6 +110,32 @@ public class InputProcessing extends JFrame {
                 removeElements(model, indices);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        });
+
+        rules.getDefaultEditor(String.class).addCellEditorListener(new CellEditorListener() {
+            @Override
+            public void editingStopped(ChangeEvent e) {
+                Object[][] data = getTableData();
+
+                try {
+                    IntelligenceWriter.delete();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                try (IntelligenceWriter writer = new IntelligenceWriter()) {
+                    for (Object[] details : data) {
+                        writer.update(details);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            @Override
+            public void editingCanceled(ChangeEvent e) {
+
             }
         });
     }
@@ -161,6 +189,19 @@ public class InputProcessing extends JFrame {
         }
 
         removeElements(model, indices);
+    }
+
+
+    private Object[][] getTableData() {
+        Object[][] data = new Object[rules.getRowCount()][rules.getColumnCount()];
+
+        for (int row = 0; row < rules.getRowCount(); row++) {
+            for (int col = 0; col < rules.getColumnCount(); col++) {
+                data[row][col] = rules.getValueAt(row, col);
+            }
+        }
+
+        return data;
     }
 }
 
@@ -219,9 +260,9 @@ class RuleAddition extends JFrame {
 
         update.addActionListener((a) -> {
             try (IntelligenceWriter writer = new IntelligenceWriter()){
-                writer.update(inputText.getText(), contains.isSelected(), outputText.getText());
+                writer.update(inputText.getText(), !contains.isSelected(), outputText.getText());
                 DefaultTableModel model = (DefaultTableModel) rules.getModel();
-                model.addRow(new Object[]{inputText.getText(), contains.isSelected(), outputText.getText()});
+                model.addRow(new Object[]{inputText.getText(), !contains.isSelected(), outputText.getText()});
                 dispose();
             } catch (IOException e) {
                 e.printStackTrace();
