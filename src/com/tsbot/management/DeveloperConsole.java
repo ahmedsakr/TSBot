@@ -38,8 +38,6 @@ import javax.swing.text.DefaultCaret;
  */
 public class DeveloperConsole extends JFrame {
 
-
-
     public DeveloperConsole() {
         super("TSBot - Developer Console");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

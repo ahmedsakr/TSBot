@@ -38,12 +38,16 @@ public class Commands {
     }
 
     public void handleTextMessage(String username, String message) throws IOException {
+        message = message.toLowerCase()
+                .replaceAll(botName.toLowerCase(), "##botname##")
+                .replaceAll(username.toLowerCase(), "##name###");
+
+        final String edited = message;
         try (IntelligenceReader reader = new IntelligenceReader()) {
             reader.intelligence().stream()
                     .filter(process ->
-                    message.replaceAll(botName, "##botname##").replaceAll(username, "##name###")
-                            .equalsIgnoreCase(process.getInputText()) || (message.replaceAll(botName, "##botname##")
-                            .contains(process.getInputText()) && process.containsOnly()))
+                            (edited.equalsIgnoreCase(process.getInputText())) ||
+                                    (edited.contains(process.getInputText()) && process.containsOnly()))
                     .forEach(process ->
                             this.api.sendServerMessage(process.getOutputText().
                                     replaceAll("##botname##", botName).replaceAll("##name##", username)));

@@ -35,6 +35,8 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ import java.util.List;
  * @author ahmad sakr
  * @since March 28, 2015.
  */
-public class InputProcessing extends JFrame {
+public class InputIntelligence extends JFrame {
 
     public JTable rules;
 
@@ -53,7 +55,7 @@ public class InputProcessing extends JFrame {
      *
      * Constructs the Input Frame and adds all the components to it.
      */
-    public InputProcessing() {
+    public InputIntelligence() {
         super("TSBot - Input Intelligence");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(500, 300));

@@ -142,15 +142,16 @@ public class TSBotLogin extends JFrame {
             Credential queryUser = new Credential(serverQueryUsername.getText());
             Credential queryPass = new Credential(serverQueryPassword.getText());
 
-            BotAccessorOperator loginWorker = new BotAccessorOperator(this, address, port, botNickname, queryUser,
+            LoginWorker loginWorker = new LoginWorker(this, address, port, botNickname, queryUser,
                     queryPass);
             dispose();
 
             loginWorker.setVisible(true);
             loginWorker.setLocationRelativeTo(null);
+
             Runnable run = () -> {
                 try {
-                    loginWorker.work();
+                    loginWorker.login();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import com.tsbot.management.DeveloperConsole;
-import com.tsbot.management.InputProcessing;
+import com.tsbot.management.InputIntelligence;
+import com.tsbot.management.Management;
 import com.tsbot.management.TSControl;
 import com.tsbot.io.IntelligenceReader;
 import javax.swing.JFrame;
@@ -40,7 +41,7 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
  * @author ahmad sakr
  * @since March 16, 2015.
  */
-public class BotAccessorOperator extends JFrame {
+public class LoginWorker extends JFrame {
 
     private TSBotLogin save;
     private Credential serverAddress, serverPort, botNickname, queryUser, queryPass;
@@ -49,7 +50,7 @@ public class BotAccessorOperator extends JFrame {
 
     /**
      *
-     * Constructor for {@link BotAccessorOperator}.
+     * Constructor for {@link LoginWorker}.
      * The reason behind requiring an object of TSBotLogin is to simply redirect the user back to the original
      * login frame if the login failed for any reason. (incorrect password or invalid username)
      * Builds the frame for logging in the user.
@@ -62,8 +63,8 @@ public class BotAccessorOperator extends JFrame {
      * @param queryUser The ServerQuery Username credential.
      * @param queryPass The ServerQuery Password credential.
      */
-    public BotAccessorOperator(TSBotLogin save, Credential serverAddress, Credential serverPort, Credential botNickname,
-                               Credential queryUser, Credential queryPass) {
+    public LoginWorker(TSBotLogin save, Credential serverAddress, Credential serverPort, Credential botNickname,
+                       Credential queryUser, Credential queryPass) {
         this.save = save;
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
@@ -93,9 +94,13 @@ public class BotAccessorOperator extends JFrame {
 
     /**
      * Establish a connection to the server that has been specified by the user.
-     * TODO rewrite the work method, it's horribly written.
+     * Initialize the {@link TS3Api} and {@link TS3Query} objects to connect to the server.
+     * If the connection is a success and the user's identification has been approved, then it proceeds
+     * to the {@link Management} object. Otherwise, the user is taken back to the login interface.
+     *
+     * @throws InterruptedException
      */
-    public void work() throws InterruptedException {
+    public void login() throws InterruptedException {
         TS3Config config = new TS3Config();
         config.setHost(serverAddress.toString());
         config.setDebugLevel(Level.ALL);
@@ -109,39 +114,20 @@ public class BotAccessorOperator extends JFrame {
         api.selectVirtualServerByPort(Integer.valueOf(serverPort.toString()));
 
         if (!isConnected(api)) {
-
             dispose();
             save.setVisible(true);
             query.exit();
             config = null;
             JOptionPane.showMessageDialog(save, "Connection to " + serverAddress + " failed." +
                     " Make sure you input the correct ServerQuery credentials.");
-        } else {
-
-            progress.setValue(1);
-            progress.setString("Success! Loading...");
-            api.setNickname(botNickname.toString());
-
-            try {
-                prepareEnvironment();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            DeveloperConsole console = new DeveloperConsole();
-            console.setVisible(true);
-            console.setLocation(0, 0);
-
-            InputProcessing input = new InputProcessing();
-            input.setVisible(true);
-            input.setLocation(0, console.getHeight() + 10);
-
-            TSControl control = new TSControl(api, botNickname.toString());
-            control.setVisible(true);
-            control.setLocation(console.getWidth() + 200, console.getHeight() / 2);
-
-            dispose();
+            return;
         }
+
+        progress.setValue(1);
+        progress.setString("Success! Loading...");
+
+        new Management(api, botNickname);
+        dispose();
     }
 
 
@@ -158,11 +144,4 @@ public class BotAccessorOperator extends JFrame {
         return api != null && api.getClients() != null;
     }
 
-
-    /**
-     * Prepares the parent folder in order to start writing files into it.
-     */
-    private void prepareEnvironment() throws IOException {
-        IntelligenceReader.createNeededDirectory();
-    }
 }

@@ -65,7 +65,6 @@ public class TSControl extends JFrame {
         super("TSBot - Control");
         this.api = api;
         this.botNickname = botNickname;
-
         this.functions = new Functions(this.api);
         this.api.registerAllEvents();
         this.api.addTS3Listeners(new CommandListener(this.api, botNickname));
@@ -256,7 +255,7 @@ public class TSControl extends JFrame {
         inputIntelligence.setBounds(10, 280, 145, 30);
         getContentPane().add(inputIntelligence);
         inputIntelligence.addActionListener((a) -> {
-            InputProcessing input = new InputProcessing();
+            InputIntelligence input = new InputIntelligence();
             input.setVisible(true);
             input.setLocationRelativeTo(null);
         });
