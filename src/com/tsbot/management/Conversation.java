@@ -19,24 +19,26 @@ package com.tsbot.management;
 
 import com.tsbot.management.interaction.Intellect;
 import com.tsbot.effects.GhostText;
-import com.tsbot.io.IntelligenceReader;
-import com.tsbot.io.IntelligenceWriter;
+import com.tsbot.io.conversation.ConReader;
+import com.tsbot.io.conversation.ConWriter;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,17 +48,17 @@ import java.util.List;
  * @author ahmad sakr
  * @since March 28, 2015.
  */
-public class InputIntelligence extends JFrame {
+public class Conversation extends JFrame {
 
     public JTable rules;
 
     /**
      * Default Constructor.
      *
-     * Constructs the Input Frame and adds all the components to it.
+     * Constructs the Conversation Frame and adds all the components to it.
      */
-    public InputIntelligence() {
-        super("TSBot - Input Intelligence");
+    public Conversation() {
+        super("TSBot - Conversation Intelligence");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(500, 300));
         setSize(getPreferredSize());
@@ -73,14 +75,14 @@ public class InputIntelligence extends JFrame {
         model.addColumn("Strictly exact as user input");
         model.addColumn("Output Text");
 
-        try (IntelligenceReader reader = new IntelligenceReader()){
+        try (ConReader reader = new ConReader()){
             List<Intellect> intelligence = reader.intelligence();
             intelligence.forEach((intellect) ->
                     model.addRow(new Object[]{
                             intellect.getInputText(), intellect.containsOnly(), intellect.getOutputText()}));
         } catch (IOException e) {
             try {
-                IntelligenceWriter.create();
+                ConWriter.create();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -92,8 +94,12 @@ public class InputIntelligence extends JFrame {
         JPanel buttons = new JPanel();
         JButton process = new JButton("Amend Intelligence");
         JButton remove = new JButton("Remove selected rows");
+        JButton save = new JButton("Save Intelligence");
+        JButton loadFile = new JButton("Load file");
         buttons.add(process);
         buttons.add(remove);
+        buttons.add(save);
+        buttons.add(loadFile);
 
         getContentPane().add(buttons, BorderLayout.SOUTH);
 
@@ -115,18 +121,90 @@ public class InputIntelligence extends JFrame {
             }
         });
 
+        save.addActionListener((a) -> {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setFileFilter(new FileNameExtensionFilter("dat", "dat"));
+            chooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            chooser.setLocation(0,0);
+            int action = chooser.showSaveDialog(this);
+
+            if (action == JFileChooser.APPROVE_OPTION) {
+                try (ConWriter writer = new ConWriter(chooser.getSelectedFile().toString() + ".dat")) {
+                    Object[][] data = getTableData();
+                    for (Object[] row : data) {
+                        writer.update(row);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+
+        loadFile.addActionListener((a) -> {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setFileFilter(new FileNameExtensionFilter("dat", "dat"));
+            chooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            chooser.setLocation(0, 0);
+
+            int action = chooser.showOpenDialog(this);
+
+            if (action == JFileChooser.APPROVE_OPTION) {
+                List<Intellect> intelligence = null;
+
+                try (ConReader reader = new ConReader(chooser.getSelectedFile().toPath())) {
+                    intelligence = reader.intelligence();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // the file that has been chosen is not a valid conversation file.
+                if (intelligence == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "File selected is an invalid file.", "Invalid File", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    int answer = JOptionPane.showConfirmDialog(this,
+                            "Would you like to override your current rules or wipe out your existent rules to be" +
+                                    " replaced by the loaded ones?", "Override", JOptionPane.YES_NO_OPTION);
+
+                    /** If the user has chosen to override their current conversation file, then it will directly
+                     *  load the new ones on top of them and save them.
+                     */
+                    if (answer == JOptionPane.YES_OPTION) {
+
+                        updateIntelligence(model, intelligence);
+
+                    } else if (answer == JOptionPane.NO_OPTION) {
+
+                        /**
+                         *  The operator has specified that they do not want their present conversation file
+                         *  and wish to destroy it and add the newly loaded ones.
+                         */
+                        while (model.getRowCount() > 0)
+                            model.removeRow(0);
+
+                        updateIntelligence(model, intelligence);
+                    }
+                }
+            }
+    });
+
         rules.getDefaultEditor(String.class).addCellEditorListener(new CellEditorListener() {
             @Override
             public void editingStopped(ChangeEvent e) {
                 Object[][] data = getTableData();
 
                 try {
-                    IntelligenceWriter.delete();
+                    ConWriter.delete();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
 
-                try (IntelligenceWriter writer = new IntelligenceWriter()) {
+                try (ConWriter writer = new ConWriter()) {
                     for (Object[] details : data) {
                         writer.update(details);
                     }
@@ -155,7 +233,7 @@ public class InputIntelligence extends JFrame {
 
         // if all the rows have been deleted the master file will be deleted as it will be redundant. (empty)
         if (model.getRowCount() == 0) {
-            IntelligenceWriter.delete();
+            ConWriter.delete();
             return;
         }
 
@@ -164,8 +242,8 @@ public class InputIntelligence extends JFrame {
          *  the file will be deleted completely and reconstructed with the remaining data.
          */
         if (indices.size() == 0) {
-            IntelligenceWriter.delete();
-            try (IntelligenceWriter writer = new IntelligenceWriter()) {
+            ConWriter.delete();
+            try (ConWriter writer = new ConWriter()) {
 
                 Object[] details = new Object[model.getColumnCount()];
                 for (int i = 0; i < model.getRowCount(); i++) {
@@ -194,6 +272,11 @@ public class InputIntelligence extends JFrame {
     }
 
 
+    /**
+     * Acquires all the data from the table and holds them in a 2D Object Array.
+     *
+     * @return the 2D object array holding the data of the table.
+     */
     private Object[][] getTableData() {
         Object[][] data = new Object[rules.getRowCount()][rules.getColumnCount()];
 
@@ -204,6 +287,35 @@ public class InputIntelligence extends JFrame {
         }
 
         return data;
+    }
+
+
+    /**
+     * Updates the intelligence master file and the table.
+     *
+     * @param model The table model.
+     * @param intelligence The latest data provided.
+     */
+    private void updateIntelligence(DefaultTableModel model, List<Intellect> intelligence) {
+        for (Intellect intellect : intelligence) {
+            model.addRow(new Object[]{intellect.getInputText(), intellect.containsOnly(),
+                    intellect.getOutputText()});
+        }
+
+        try {
+            ConWriter.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (ConWriter writer = new ConWriter()) {
+            Object[][] data = getTableData();
+            for (Object[] row : data) {
+                writer.update(row);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -261,7 +373,7 @@ class RuleAddition extends JFrame {
         getContentPane().add(actions, BorderLayout.SOUTH);
 
         update.addActionListener((a) -> {
-            try (IntelligenceWriter writer = new IntelligenceWriter()){
+            try (ConWriter writer = new ConWriter()){
                 writer.update(inputText.getText(), !contains.isSelected(), outputText.getText());
                 DefaultTableModel model = (DefaultTableModel) rules.getModel();
                 model.addRow(new Object[]{inputText.getText(), !contains.isSelected(), outputText.getText()});

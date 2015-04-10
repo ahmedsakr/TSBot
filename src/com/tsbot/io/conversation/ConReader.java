@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tsbot.io;
+package com.tsbot.io.conversation;
 
 
 import com.tsbot.management.interaction.Intellect;
@@ -28,47 +28,63 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Consists the Reading job of the I/O for the input intelligence. Solely brought to life to read the intelligence file
- * and sort the data into objects that can be easily used to manipulate input from users on the teamspeak server.
+ * Consists the Reading job of the I/O for the conversation handling. Solely brought to life to read the
+ * intelligence file and sort the data into objects that can be easily used to manipulate input from users
+ * on the teamspeak server.
  *
  *
  * @author Ahmad Sakr
  * @since March 31, 2015.
  */
-public class IntelligenceReader extends BufferedReader {
+public class ConReader extends BufferedReader {
 
     private ArrayList<Intellect> intelligence;
     private static boolean updated;
 
-    public static final Path INPUT_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
-            "/appdata/roaming/TSBot/InputIntelligence.dat");
+    public static final Path CONVERSATION_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
+            "/appdata/roaming/TSBot/Conversation.dat");
 
     /**
      * Default constructor. Calls the super constructor of {@link BufferedReader}
      *
      * @throws IOException
      */
-    public IntelligenceReader() throws IOException {
-        super(new FileReader(INPUT_INTELLIGENCE_LOCATION.toString()));
+    public ConReader() throws IOException {
+        super(new FileReader(CONVERSATION_INTELLIGENCE_LOCATION.toString()));
     }
 
     /**
-     * Connects to the file ({@link IntelligenceReader#INPUT_INTELLIGENCE_LOCATION}. Converts all binary input
+     * Constructor used when the user specifies to load a saved conversation.dat file
+     *
+     * @param path the path to the file
+     * @throws IOException
+     */
+    public ConReader(Path path) throws IOException {
+        super(new FileReader(path.toString()));
+    }
+
+    public boolean isValidStatement(String stmt) {
+        return stmt.contains("<input_text=\"") && stmt.contains("contains=\"") &&
+                stmt.contains("output_text=\"");
+    }
+
+    /**
+     * Connects to the file ({@link ConReader#CONVERSATION_INTELLIGENCE_LOCATION}. Converts all binary input
      * to decimal, and then finally to String. Through the use of toIntellect(String) function, an Intellect
-     * object is appended to the {@link IntelligenceReader#intelligence}.
+     * object is appended to the {@link ConReader#intelligence}.
      * <p>
      * Constant reading from the file is redundant, as it can lead to the same data if no other processes have been
      * deleted or added. In order to prevent this, a check is deployed to check whether the data in processes
-     * is up-to-date or not. If it is update, then return {@link IntelligenceReader#intelligence} without
+     * is up-to-date or not. If it is update, then return {@link ConReader#intelligence} without
      * further inspection.
      *
-     * @return {@link IntelligenceReader#intelligence}.
+     * @return {@link ConReader#intelligence}.
      * @throws IOException
      *
      * @see Intellect
-     * @see IntelligenceReader#toIntellect(String)
-     * @see IntelligenceReader#invalidate()
-     * @see IntelligenceReader#isUpdated()
+     * @see ConReader#toIntellect(String)
+     * @see ConReader#invalidate()
+     * @see ConReader#isUpdated()
      */
     public ArrayList<Intellect> intelligence() throws IOException {
         if (this.intelligence == null || !isUpdated()) {
@@ -83,6 +99,10 @@ public class IntelligenceReader extends BufferedReader {
                     intellect.append(Character.toString((char) decimal));
                 }
 
+                if (!isValidStatement(intellect.toString())) {
+                    return null;
+                }
+
                 intelligence.add(toIntellect(intellect.toString()));
                 intellect = new StringBuilder();
             }
@@ -95,7 +115,7 @@ public class IntelligenceReader extends BufferedReader {
     }
 
     /**
-     * Invalidates the data held in {@link IntelligenceReader#intelligence} and sets it to outdated.
+     * Invalidates the data held in {@link ConReader#intelligence} and sets it to outdated.
      * Static usage is needed and optimal in this function for completely control over all objects of this class
      * and ease of invalidation without the need to construct the class.
      */
@@ -143,11 +163,17 @@ public class IntelligenceReader extends BufferedReader {
     }
 
 
+    /**
+     * Creates the needed parent directory to work upon.
+     *
+     * @return the path to the parent directory.
+     * @throws IOException
+     */
     public static Path createNeededDirectory() throws IOException {
-        if (Files.isDirectory(INPUT_INTELLIGENCE_LOCATION.getParent()))
+        if (Files.isDirectory(CONVERSATION_INTELLIGENCE_LOCATION.getParent()))
             return null;
 
-        return Files.createDirectory(INPUT_INTELLIGENCE_LOCATION.getParent());
+        return Files.createDirectory(CONVERSATION_INTELLIGENCE_LOCATION.getParent());
     }
 
 }

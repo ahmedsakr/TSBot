@@ -23,14 +23,9 @@ import com.tsbot.login.security.Credential;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.IOException;
 import java.util.logging.Level;
 
-import com.tsbot.management.DeveloperConsole;
-import com.tsbot.management.InputIntelligence;
 import com.tsbot.management.Management;
-import com.tsbot.management.TSControl;
-import com.tsbot.io.IntelligenceReader;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;

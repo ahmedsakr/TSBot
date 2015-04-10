@@ -18,7 +18,7 @@ package com.tsbot.management;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.tsbot.io.IntelligenceReader;
+import com.tsbot.io.conversation.ConReader;
 import com.tsbot.login.security.Credential;
 
 import java.io.IOException;
@@ -48,23 +48,15 @@ public class Management {
 
         api.setNickname(botNickname.toString());
 
-        DeveloperConsole console = new DeveloperConsole();
-        console.setVisible(true);
-        console.setLocation(0, 0);
-
-        InputIntelligence input = new InputIntelligence();
-        input.setVisible(true);
-        input.setLocation(0, console.getHeight() + 10);
-
         TSControl control = new TSControl(api, botNickname.toString());
         control.setVisible(true);
-        control.setLocation(console.getWidth() + 200, console.getHeight() / 2);
+        control.setLocationRelativeTo(null);
     }
 
     /**
      * Prepares the parent folder in order to start writing files into it.
      */
     private void prepareEnvironment() throws IOException {
-        IntelligenceReader.createNeededDirectory();
+        ConReader.createNeededDirectory();
     }
 }

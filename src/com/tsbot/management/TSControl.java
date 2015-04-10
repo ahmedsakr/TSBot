@@ -251,17 +251,17 @@ public class TSControl extends JFrame {
         getContentPane().add(refresh);
         refresh.addActionListener(a -> this.functions.refreshClients(onlineClients, this.api.getClients(), botNickname));
 
-        JButton inputIntelligence = new JButton("Input Intelligence");
-        inputIntelligence.setBounds(10, 280, 145, 30);
+        JButton inputIntelligence = new JButton("Conversation Intelligence");
+        inputIntelligence.setBounds(10, 280, 300, 30);
         getContentPane().add(inputIntelligence);
         inputIntelligence.addActionListener((a) -> {
-            InputIntelligence input = new InputIntelligence();
+            Conversation input = new Conversation();
             input.setVisible(true);
             input.setLocationRelativeTo(null);
         });
 
         JButton developerConsole = new JButton("Developer Console");
-        developerConsole.setBounds(165, 280, 145, 30);
+        developerConsole.setBounds(320, 280, 150, 30);
         getContentPane().add(developerConsole);
         developerConsole.addActionListener((a) -> {
             DeveloperConsole input = new DeveloperConsole();

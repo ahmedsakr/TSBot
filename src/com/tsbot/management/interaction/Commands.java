@@ -18,7 +18,7 @@ package com.tsbot.management.interaction;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.tsbot.io.IntelligenceReader;
+import com.tsbot.io.conversation.ConReader;
 
 import java.io.IOException;
 
@@ -43,7 +43,7 @@ public class Commands {
                 .replaceAll(username.toLowerCase(), "##name###");
 
         final String edited = message;
-        try (IntelligenceReader reader = new IntelligenceReader()) {
+        try (ConReader reader = new ConReader()) {
             reader.intelligence().stream()
                     .filter(process ->
                             (edited.equalsIgnoreCase(process.getInputText())) ||

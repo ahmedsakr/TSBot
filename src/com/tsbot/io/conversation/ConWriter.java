@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tsbot.io;
+package com.tsbot.io.conversation;
 
 
 import java.io.BufferedWriter;
@@ -27,17 +27,17 @@ import java.nio.file.Paths;
 
 
 /**
- * Consists the Writing part of the I/O package for input intelligence. Solely brought to life in the means of
- * updating the intelligence file. All Data written is strictly in binary.
+ * Consists the Writing part of the I/O package for the conversation handling. Solely brought to life in the means of
+ * updating the conversation file. All Data written is strictly in binary.
  *
  *
  * @author ahmad sakr
  * @since March 31, 2015.
  */
-public class IntelligenceWriter extends BufferedWriter {
+public class ConWriter extends BufferedWriter {
 
-    public static final Path INPUT_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
-            "/appdata/roaming/TSBot/InputIntelligence.dat");
+    public static final Path CONVERSATION_INTELLIGENCE_LOCATION = Paths.get(System.getProperty("user.home") +
+            "/appdata/roaming/TSBot/Conversation.dat");
 
 
     /**
@@ -47,14 +47,19 @@ public class IntelligenceWriter extends BufferedWriter {
      *
      * @throws IOException
      */
-    public IntelligenceWriter() throws IOException {
-        super(new FileWriter(INPUT_INTELLIGENCE_LOCATION.toString(), true));
+    public ConWriter() throws IOException {
+        super(new FileWriter(CONVERSATION_INTELLIGENCE_LOCATION.toString(), true));
+    }
+
+
+    public ConWriter(String path) throws IOException {
+        super(new FileWriter(path, true));
     }
 
 
     /**
      * Updates the file to hold a new record of a process. All data is converted to binary before it is written
-     * to the file. All data held by objects of {@link IntelligenceReader} are invalidated.
+     * to the file. All data held by objects of {@link ConReader} are invalidated.
      *
      * @param inputText the input text that the user will be required to input to trigger this process
      * @param contains the condition whether the inputText needs to be only in the original input or not.
@@ -62,8 +67,8 @@ public class IntelligenceWriter extends BufferedWriter {
      *
      * @throws IOException
      *
-     * @see IntelligenceWriter#toBinary(String)
-     * @see IntelligenceReader#invalidate()
+     * @see ConWriter#toBinary(String)
+     * @see ConReader#invalidate()
      */
     public void update(String inputText, boolean contains, String outputText) throws IOException {
         String binaryInput = toBinary("<input_text=\"" + inputText.replace("\t", " ") + "\"\t");
@@ -73,7 +78,7 @@ public class IntelligenceWriter extends BufferedWriter {
         write(binaryInput + binaryOutput + binaryContains);
         newLine();
 
-        IntelligenceReader.invalidate();
+        ConReader.invalidate();
     }
 
 
@@ -83,7 +88,7 @@ public class IntelligenceWriter extends BufferedWriter {
 
 
     /**
-     * If the file exists, then it will be deleted. The data held by all objects of {@link IntelligenceReader} is
+     * If the file exists, then it will be deleted. The data held by all objects of {@link ConReader} is
      * invalidated automatically upon call of this method.
      * Static usage is crucially needed in this function. Constructing the object and calling this method object-wise
      * will throw a {@link java.nio.file.FileSystemException} as it will be in use by the writer.
@@ -91,15 +96,15 @@ public class IntelligenceWriter extends BufferedWriter {
      * @return if the file has been deleted or not.
      * @throws IOException
      *
-     * @see IntelligenceReader#invalidate()
+     * @see ConReader#invalidate()
      */
     public static boolean delete() throws IOException {
-        IntelligenceReader.invalidate();
-        return Files.deleteIfExists(INPUT_INTELLIGENCE_LOCATION);
+        ConReader.invalidate();
+        return Files.deleteIfExists(CONVERSATION_INTELLIGENCE_LOCATION);
     }
 
     /**
-     * Creates the file in the path {@link IntelligenceWriter#INPUT_INTELLIGENCE_LOCATION} if it does not exist.
+     * Creates the file in the path {@link ConWriter#CONVERSATION_INTELLIGENCE_LOCATION} if it does not exist.
      * Static usage is crucially needed in this function. Constructing the object and calling this method object-wise
      * will throw a {@link java.nio.file.FileSystemException} as it will be in use by the writer.
      *
@@ -107,10 +112,10 @@ public class IntelligenceWriter extends BufferedWriter {
      * @throws IOException
      */
     public static Path create() throws IOException {
-        if (Files.exists(INPUT_INTELLIGENCE_LOCATION))
+        if (Files.exists(CONVERSATION_INTELLIGENCE_LOCATION))
             return null;
 
-        return Files.createFile(INPUT_INTELLIGENCE_LOCATION);
+        return Files.createFile(CONVERSATION_INTELLIGENCE_LOCATION);
     }
 
 
