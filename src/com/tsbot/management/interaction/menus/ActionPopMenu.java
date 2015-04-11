@@ -18,17 +18,12 @@ package com.tsbot.management.interaction.menus;
 
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelGroup;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
 import com.tsbot.management.interaction.Functions;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -37,13 +32,19 @@ import java.util.List;
  */
 public class ActionPopMenu extends JPopupMenu {
 
-
     private TS3Api api;
-    private List<ServerGroup> serverGroupsList;
-    private List<ChannelGroup> channelGroupsList;
-    private List<JCheckBoxMenuItem> serverGroupsBoxes = new ArrayList<>(), channelGroupsBoxes = new ArrayList<>();
     private Functions functions;
 
+
+
+    /**
+     * Constructor for {@link ActionPopMenu}.
+     *
+     * Adds all the functions to the {@link JPopupMenu} and assigns their action upon click.
+     *
+     * @param api The Active {@link TS3Api}.
+     * @param clients The {@link JList} that holds the online clients on the server.
+     */
     public ActionPopMenu(TS3Api api, JList clients) {
         this.api = api;
         this.functions = new Functions(this.api);
@@ -62,22 +63,32 @@ public class ActionPopMenu extends JPopupMenu {
 
 
         permissions.addActionListener((a) -> {
-            Runnable r = () ->
+            Runnable r = () -> {
+                if (this.api.getClientByNameExact(clients.getSelectedValue().toString(), false) != null) {
                     functions.permissions(this.api.getClientByNameExact(clients.getSelectedValue().toString(), false));
+                }
+            };
 
             new Thread(r).start();
         });
 
         channelKick.addActionListener((a) -> {
-            Runnable r = () ->
+            Runnable r = () -> {
+                if (this.api.getClientByNameExact(clients.getSelectedValue().toString(), false) != null) {
                     functions.kickFromChannel(api.getClientByNameExact(clients.getSelectedValue().toString(), false));
+                }
+            };
 
             new Thread(r).start();
         });
 
         serverKick.addActionListener((a) -> {
-            Runnable r = () ->
+            Runnable r = () -> {
+                if (this.api.getClientByNameExact(clients.getSelectedValue().toString(), false) != null) {
                     functions.kickFromServer(api.getClientByNameExact(clients.getSelectedValue().toString(), false));
+                    clients.remove(clients.getSelectedIndex());
+                }
+            };
 
             new Thread(r).start();
         });
@@ -89,8 +100,12 @@ public class ActionPopMenu extends JPopupMenu {
             if (hours == 0)
                 return;
 
-            Runnable r = () ->
+            Runnable r = () -> {
+                if (this.api.getClientByNameExact(clients.getSelectedValue().toString(), false) != null) {
                     functions.ban(api.getClientByNameExact(clients.getSelectedValue().toString(), false), hours);
+                    clients.remove(clients.getSelectedIndex());
+                }
+            };
 
             new Thread(r).start();
         });

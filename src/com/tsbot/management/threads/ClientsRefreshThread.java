@@ -21,7 +21,6 @@ import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.tsbot.management.interaction.Functions;
 import javax.swing.JList;
 import javax.swing.ListModel;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -35,6 +34,13 @@ public class ClientsRefreshThread extends Thread {
     private Functions functions;
     private String botNickname;
 
+    /**
+     * Constructor for {@link ClientsRefreshThread}.
+     *
+     * @param api The Active {@link TS3Api}.
+     * @param clients The {@link JList} that holds all online clients.
+     * @param botNickname The nickname of the bot set by the operator.
+     */
     public ClientsRefreshThread(TS3Api api, JList clients, String botNickname) {
         this.api = api;
         this.clients = clients;
@@ -42,18 +48,25 @@ public class ClientsRefreshThread extends Thread {
         this.functions = new Functions(api);
     }
 
+
+    /**
+     * A Task every 7500 Milliseconds that will update the online client's List.
+     */
     @Override
     public synchronized void run() {
         try {
             while (true) {
                 sleep(7500);
-                Object clientName = this.clients.getSelectedValue();
-                functions.refreshClients(this.clients, this.api.getClients(), this.botNickname);
-                ListModel model = this.clients.getModel();
-                for (int i = 0; i < model.getSize(); i++) {
-                    if (model.getElementAt(i).equals(clientName)) {
-                        this.clients.setSelectedIndex(i);
-                        break;
+
+                if (this.api.getClients().size() > 0) {
+                    Object clientName = this.clients.getSelectedValue();
+                    functions.refreshClients(this.clients, this.api.getClients(), this.botNickname);
+                    ListModel model = this.clients.getModel();
+                    for (int i = 0; i < model.getSize(); i++) {
+                        if (model.getElementAt(i).equals(clientName)) {
+                            this.clients.setSelectedIndex(i);
+                            break;
+                        }
                     }
                 }
             }

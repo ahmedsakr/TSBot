@@ -45,7 +45,10 @@ public class UserActionListener extends MouseAdapter {
         if (e.isPopupTrigger()) {
             JList list = (JList) e.getSource();
             list.setSelectedIndex(list.locationToIndex(e.getPoint()));
-            showMenu(e);
+
+            if (list.getSelectedIndex() != -1) {
+                showMenu(e);
+            }
         }
     }
 
