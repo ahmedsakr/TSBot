@@ -55,6 +55,13 @@ public class Functions {
         this.api = api;
     }
 
+    public void permissions(Client client) {
+        List<Client> list = new ArrayList<>();
+        list.add(client);
+
+        permissions(list);
+    }
+
 
     /**
      * Loads the permissions for the selected clients, giving the operator an interface to
@@ -284,11 +291,40 @@ public class Functions {
      * @param clients the clients to be banned from the server.
      * @param hours   the time period for the clients to be banned.
      */
-    public void ban(List<Client> clients, int hours) {
+    public void ban(List<Client> clients, double hours) {
         // hours is being multiplied by 3600 as the input for banClient is seconds.
-        clients.forEach((client) -> api.banClient(client.getId(), hours * 3600));
+        clients.forEach((client) -> ban(client, hours));
     }
 
+
+    /**
+     * Bans the client with a timeout of hours as provided.
+     *
+     * @param client The Client to be banned.
+     * @param hours The Time for the client to be banned.
+     */
+    public void ban(Client client, double hours) {
+        api.banClient(client.getId(), (int) (hours * 3600));
+    }
+
+    /**
+     * Kicks the specified client from the server.
+     *
+     * @param client The Client to be acted upon.
+     */
+    public void kickFromServer(Client client) {
+        api.kickClientFromServer(client);
+    }
+
+
+    /**
+     * Kicks the specified client from their current channel, and automatically moves them to the default channel.
+     *
+     * @param client The Client to be acted upon.
+     */
+    public void kickFromChannel(Client client) {
+        api.kickClientFromChannel(client);
+    }
 
     /**
      * Updates the online clients in the list.

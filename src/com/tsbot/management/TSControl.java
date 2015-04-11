@@ -19,6 +19,7 @@ package com.tsbot.management;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.tsbot.management.interaction.listeners.UserActionListener;
 import com.tsbot.management.interaction.listeners.CommandListener;
 import com.tsbot.management.interaction.Functions;
 
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tsbot.effects.GhostText;
+import com.tsbot.management.threads.ClientsRefreshThread;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -50,6 +52,7 @@ public class TSControl extends JFrame {
     private TS3Api api;
     private Functions functions;
     private String botNickname;
+    private JList onlineClients;
 
 
     /**
@@ -115,6 +118,9 @@ public class TSControl extends JFrame {
         });
 
         components();
+
+        ClientsRefreshThread refreshThread = new ClientsRefreshThread(this.api, onlineClients, this.botNickname);
+        refreshThread.start();
     }
 
 
@@ -144,56 +150,13 @@ public class TSControl extends JFrame {
             chatArea.setText(chatDisplayText.toString());
         });
 
-        JTextField pokeText = new JTextField(15);
-        pokeText.setBounds(10,60,300,40);
-        GhostText pokeDisplayText = new GhostText("Enter Poke Text...", pokeText);
-        getContentPane().add(pokeText);
-
-        JButton pokeAll = new JButton("Poke All");
-        pokeAll.setBounds(320,60,150,20);
-        getContentPane().add(pokeAll);
-        pokeAll.addActionListener(a -> {
-
-            if (pokeText.getText().isEmpty() || pokeText.getText().equalsIgnoreCase("Enter Poke Text..."))
-                return;
-
-            Runnable r = () -> {
-                this.functions.poke(this.api.getClients(), pokeText.getText());
-                pokeText.setText(pokeDisplayText.toString());
-            };
-
-            new Thread(r).start();
-        });
-
-        JButton pokeClient = new JButton("Poke Client");
-        pokeClient.setBounds(320, 80, 150, 20);
-        getContentPane().add(pokeClient);
-        pokeClient.addActionListener(a -> {
-
-            if (pokeText.getText().isEmpty() || pokeText.getText().equalsIgnoreCase("Enter Poke Text..."))
-                return;
-
-            String client = JOptionPane.showInputDialog(null,
-                    "Enter a client's username:", "Input Client", JOptionPane.INFORMATION_MESSAGE);
-
-            if (client == null || client.isEmpty())
-                return;
-
-            Runnable r = () -> {
-                this.functions.poke(this.api.getClientByNameExact(client, true), pokeText.getText());
-                pokeText.setText(pokeDisplayText.toString());
-            };
-
-            new Thread(r).start();
-
-        });
-
         DefaultListModel model = new DefaultListModel();
-        JList onlineClients = new JList(model);
+        onlineClients = new JList(model);
+        onlineClients.addMouseListener(new UserActionListener(this.api, onlineClients));
         JScrollPane pane = new JScrollPane(onlineClients);
         onlineClients.setBackground(Color.GRAY);
         onlineClients.setSelectionBackground(Color.RED);
-        pane.setBounds(10, 120, 300, 150);
+        pane.setBounds(10, 60, 460, 250);
         getContentPane().add(pane);
 
         this.api.getClients().forEach((client) -> {
@@ -202,57 +165,8 @@ public class TSControl extends JFrame {
             }
         });
 
-        JButton permissions = new JButton("Permissions");
-        permissions.setBounds(320, 120, 150, 30);
-        getContentPane().add(permissions);
-        permissions.addActionListener(a -> {
-            Runnable run = () -> {
-                List<Client> selectedClients = new ArrayList<>();
-                for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(this.api.getClientByNameExact(model.get(index).toString(), true));
-                }
-
-                this.functions.permissions(selectedClients);
-            };
-
-            new Thread(run).start();
-        });
-
-
-        JButton ban = new JButton("Ban");
-        ban.setBounds(320, 160, 150, 30);
-        getContentPane().add(ban);
-        ban.addActionListener(a -> {
-
-            int seconds = Integer.valueOf(JOptionPane.showInputDialog(null,
-                    "Enter amount of hours to ban:", "Ban Time", JOptionPane.INFORMATION_MESSAGE));
-
-            if (seconds == 0)
-                return;
-
-            Runnable run = () -> {
-                List<Client> selectedClients = new ArrayList<>();
-                for (int index : onlineClients.getSelectedIndices()) {
-                    selectedClients.add(this.api.getClientByNameExact(model.get(index).toString(), true));
-                }
-
-                this.functions.ban(selectedClients, seconds);
-            };
-
-            new Thread(run).start();
-        });
-
-        JButton banList = new JButton("Ban List");
-        banList.setBounds(320, 200, 150, 30);
-        getContentPane().add(banList);
-
-        JButton refresh = new JButton("Refresh Clients");
-        refresh.setBounds(320, 240, 150, 30);
-        getContentPane().add(refresh);
-        refresh.addActionListener(a -> this.functions.refreshClients(onlineClients, this.api.getClients(), botNickname));
-
         JButton inputIntelligence = new JButton("Conversation Intelligence");
-        inputIntelligence.setBounds(10, 280, 300, 30);
+        inputIntelligence.setBounds(10, 320, 300, 30);
         getContentPane().add(inputIntelligence);
         inputIntelligence.addActionListener((a) -> {
             Conversation input = new Conversation();
@@ -261,7 +175,7 @@ public class TSControl extends JFrame {
         });
 
         JButton developerConsole = new JButton("Developer Console");
-        developerConsole.setBounds(320, 280, 150, 30);
+        developerConsole.setBounds(320, 320, 150, 30);
         getContentPane().add(developerConsole);
         developerConsole.addActionListener((a) -> {
             DeveloperConsole input = new DeveloperConsole();
